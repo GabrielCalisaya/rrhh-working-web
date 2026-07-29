@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { JobCard } from "@/components/jobs/JobCard";
@@ -20,7 +21,7 @@ const vacancy = {
 
 describe("JobCard", () => {
   it("renders vacancy data", () => {
-    render(<JobCard vacancy={vacancy} />);
+    render(React.createElement(JobCard, { vacancy }));
 
     expect(screen.getByText("QA Engineer")).toBeInTheDocument();
     expect(screen.getByText("Rosario")).toBeInTheDocument();

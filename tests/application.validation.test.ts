@@ -4,7 +4,7 @@ import { applicationSchema } from "@/lib/validators/application";
 describe("applicationSchema", () => {
   it("accepts valid payload", () => {
     const result = applicationSchema.safeParse({
-      vacancyId: "10000000-0000-0000-0000-000000000001",
+      vacancyId: "550e8400-e29b-41d4-a716-446655440000",
       candidate: {
         fullName: "Ana Pérez",
         email: "ana@test.com",
@@ -24,7 +24,7 @@ describe("applicationSchema", () => {
 
   it("rejects payload without consent", () => {
     const result = applicationSchema.safeParse({
-      vacancyId: "10000000-0000-0000-0000-000000000001",
+      vacancyId: "550e8400-e29b-41d4-a716-446655440000",
       candidate: {
         fullName: "Ana Pérez",
         email: "ana@test.com",
