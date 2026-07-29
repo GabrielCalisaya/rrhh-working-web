@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RRHH Working Web
 
-## Getting Started
+MVP profesional de **RRHH Working (Argentina)** con sitio público de empleos y panel admin multiusuario.
 
-First, run the development server:
+## Stack
+
+- Next.js 15 (App Router) + TypeScript + Tailwind
+- Supabase (Auth, PostgreSQL, Storage)
+- Vitest + Testing Library
+- Deploy objetivo: Vercel
+
+## Requisitos
+
+- Node.js 20+
+- npm 10+
+- Proyecto Supabase creado
+
+## Variables de entorno
+
+Copiar `.env.example` a `.env.local` y completar:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_STORAGE_BUCKET`
+- `ENABLE_MATCHING=false`
+- `ENABLE_AUTO_EMAIL=false`
+- `MATCHING_THRESHOLD=70`
+- `EMAIL_PROVIDER` (`resend` o `brevo`)
+- `RESEND_API_KEY` / `BREVO_API_KEY`
+
+## Setup local
+
+1. Instalar dependencias:
+   ```bash
+   npm install
+   ```
+2. Configurar variables en `.env.local`.
+3. Ejecutar en desarrollo:
+   ```bash
+   npm run dev
+   ```
+4. Abrir `http://localhost:3000`.
+
+## Scripts
+
+- `npm run dev`
+- `npm run build`
+- `npm run start`
+- `npm run lint`
+- `npm run test`
+
+## Supabase SQL
+
+Aplicar en orden:
+
+1. `supabase/schema.sql`
+2. `supabase/rls.sql`
+3. `supabase/seed.sql`
+
+Nota: la postulación pública se inserta por API server usando **service role**, no directo desde cliente por RLS.
+
+## Tests
+
+Ejecutar:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Incluye validaciones, filtros, guards, mapper y UI básica.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy en Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Importar repositorio en Vercel.
+2. Configurar las mismas variables de entorno.
+3. Deploy automático en cada push/PR.
+4. Verificar rutas públicas, admin, API y build.
 
-## Learn More
+## Roadmap fase 2
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Matching avanzado por skills + seniority + ponderaciones.
+- Emails automáticos reales con Resend/Brevo detrás de feature flags.
+- Cambio de estado de postulaciones desde UI admin.
+- Gestión completa de roles admin/recruiter desde panel.
