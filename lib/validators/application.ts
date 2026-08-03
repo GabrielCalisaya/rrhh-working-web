@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const applicationStatusSchema = z.enum(["new", "review", "shortlist", "rejected", "hired"]);
+
 export const applicationSchema = z.object({
   vacancyId: z.string().uuid(),
   candidate: z.object({
@@ -16,4 +18,10 @@ export const applicationSchema = z.object({
   cvFilePath: z.string().optional(),
 });
 
+export const applicationStatusUpdateSchema = z.object({
+  id: z.string().uuid(),
+  status: applicationStatusSchema,
+});
+
 export type ApplicationInput = z.infer<typeof applicationSchema>;
+export type ApplicationStatusUpdateInput = z.infer<typeof applicationStatusUpdateSchema>;

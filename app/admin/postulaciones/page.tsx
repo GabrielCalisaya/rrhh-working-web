@@ -1,5 +1,7 @@
 import { requireStaffAccess } from "@/lib/auth/guards";
 import { getSupabaseServiceRoleClient } from "@/lib/supabase/server";
+import { ApplicationsManager, type AdminApplicationItem } from "@/components/admin/ApplicationsManager";
+import type { ApplicationStatus } from "@/lib/types";
 
 type CandidateInfo = {
   full_name: string;
@@ -12,7 +14,7 @@ type VacancyInfo = {
 
 type ApplicationRow = {
   id: string;
-  status: string;
+  status: ApplicationStatus;
   candidates: CandidateInfo | CandidateInfo[] | null;
   vacancies: VacancyInfo | VacancyInfo[] | null;
 };
@@ -33,26 +35,23 @@ export default async function AdminPostulacionesPage() {
     .order("created_at", { ascending: false });
 
   const applications = (applicationsRaw ?? []) as ApplicationRow[];
+  const normalizedApplications: AdminApplicationItem[] = applications.map((application) => {
+    const candidate = getSingleItem(application.candidates);
+    const vacancy = getSingleItem(application.vacancies);
+
+    return {
+      id: application.id,
+      status: application.status,
+      vacancyTitle: vacancy?.title ?? "Vacante",
+      candidateName: candidate?.full_name ?? "Candidato",
+      candidateEmail: candidate?.email ?? "",
+    };
+  });
 
   return (
     <section className="space-y-4">
       <h1 className="text-2xl font-semibold">Postulaciones</h1>
-      <p className="text-sm text-[var(--color-primary-dark)]">El cambio de estado se realiza vía API /api/applications (PATCH futuro).</p>
-      <div className="grid gap-3">
-        {applications.map((application) => {
-          const candidate = getSingleItem(application.candidates);
-          const vacancy = getSingleItem(application.vacancies);
-
-          return (
-            <article key={application.id} className="rounded-lg border border-[var(--color-accent)] bg-white p-4 text-sm">
-              <p className="font-semibold">{vacancy?.title ?? "Vacante"}</p>
-              <p>{candidate?.full_name ?? "Candidato"}</p>
-              <p className="text-[var(--color-primary-dark)]">{candidate?.email ?? ""}</p>
-              <p className="mt-1 uppercase tracking-wide text-[var(--color-primary-dark)]">Estado: {application.status}</p>
-            </article>
-          );
-        })}
-      </div>
+      <ApplicationsManager initialApplications={normalizedApplications} />
     </section>
   );
 }
