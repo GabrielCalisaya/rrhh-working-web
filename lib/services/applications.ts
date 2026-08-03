@@ -1,8 +1,10 @@
 import type { ApplicationInput } from "@/lib/validators/application";
 import { calculateSkillsScore } from "@/lib/utils/skills";
 import { getSupabaseServiceRoleClient } from "@/lib/supabase/server";
+import type { ApplicationStatusUpdateInput } from "@/lib/validators/application";
 
 const MATCHING_THRESHOLD = Number(process.env.MATCHING_THRESHOLD ?? "70");
+const MAX_CV_SIZE_BYTES = 5 * 1024 * 1024;
 
 function isMatchingEnabled() {
   return process.env.ENABLE_MATCHING === "true";
@@ -10,6 +12,10 @@ function isMatchingEnabled() {
 
 function isAutoEmailEnabled() {
   return process.env.ENABLE_AUTO_EMAIL === "true";
+}
+
+function isCvUploadEnabled() {
+  return process.env.ENABLE_CV_UPLOAD === "true";
 }
 
 export async function createApplication(input: ApplicationInput) {
@@ -90,4 +96,56 @@ export async function sendMatchingEmailStub(email: string, score: number) {
     email,
     score,
   };
+}
+
+export async function updateApplicationStatus(input: ApplicationStatusUpdateInput) {
+  const supabase = getSupabaseServiceRoleClient();
+  const { data, error } = await supabase
+    .from("applications")
+    .update({ status: input.status })
+    .eq("id", input.id)
+    .select("id, vacancy_id, candidate_id, status, created_at")
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function uploadCvFile(file: File) {
+  if (!isCvUploadEnabled()) {
+    throw new Error("La carga de CV no está habilitada");
+  }
+
+  if (file.size > MAX_CV_SIZE_BYTES) {
+    throw new Error("El CV supera el tamaño máximo permitido (5MB)");
+  }
+
+  if (!file.type.includes("pdf")) {
+    throw new Error("Solo se permiten archivos PDF");
+  }
+
+  const bucket = process.env.SUPABASE_STORAGE_BUCKET;
+  if (!bucket) {
+    throw new Error("SUPABASE_STORAGE_BUCKET no configurado");
+  }
+
+  const supabase = getSupabaseServiceRoleClient();
+  const extension = file.name.split(".").pop()?.toLowerCase() ?? "pdf";
+  const filePath = `cvs/${crypto.randomUUID()}.${extension}`;
+  const arrayBuffer = await file.arrayBuffer();
+  const fileBuffer = Buffer.from(arrayBuffer);
+
+  const { error } = await supabase.storage.from(bucket).upload(filePath, fileBuffer, {
+    contentType: file.type || "application/pdf",
+    upsert: false,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return filePath;
 }

@@ -13,9 +13,40 @@ export function ApplyForm({ vacancyId }: ApplyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  async function uploadCv(file: File) {
+    const uploadPayload = new FormData();
+    uploadPayload.append("file", file);
+
+    const uploadResponse = await fetch("/api/applications/upload-cv", {
+      method: "POST",
+      body: uploadPayload,
+    });
+
+    const uploadResult = (await uploadResponse.json()) as { data?: { path: string }; error?: string };
+    if (!uploadResponse.ok || !uploadResult.data?.path) {
+      throw new Error(uploadResult.error ?? "No se pudo subir el CV");
+    }
+
+    return uploadResult.data.path;
+  }
+
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
     setMessage(null);
+
+    const uploadedFile = formData.get("cvFile");
+    const existingCvPath = String(formData.get("cvFilePath") ?? "").trim();
+    let cvFilePath: string | undefined = existingCvPath || undefined;
+
+    if (uploadedFile instanceof File && uploadedFile.size > 0) {
+      try {
+        cvFilePath = await uploadCv(uploadedFile);
+      } catch (error) {
+        setMessage((error as Error).message);
+        setIsSubmitting(false);
+        return;
+      }
+    }
 
     const payload = {
       vacancyId,
@@ -33,7 +64,7 @@ export function ApplyForm({ vacancyId }: ApplyFormProps) {
         consent: formData.get("consent") === "on",
       },
       coverLetter: String(formData.get("coverLetter") ?? ""),
-      cvFilePath: String(formData.get("cvFilePath") ?? "") || undefined,
+      cvFilePath,
     };
 
     const result = applicationSchema.safeParse(payload);
@@ -110,8 +141,15 @@ export function ApplyForm({ vacancyId }: ApplyFormProps) {
       </div>
 
       <div>
+        <label htmlFor="cvFile" className="mb-1 block text-sm font-medium">
+          CV en PDF (opcional)
+        </label>
+        <Input id="cvFile" name="cvFile" type="file" accept="application/pdf" />
+      </div>
+
+      <div>
         <label htmlFor="cvFilePath" className="mb-1 block text-sm font-medium">
-          Ruta CV en Storage (opcional)
+          Ruta CV en Storage (opcional/manual)
         </label>
         <Input id="cvFilePath" name="cvFilePath" placeholder="cvs/archivo.pdf" />
       </div>

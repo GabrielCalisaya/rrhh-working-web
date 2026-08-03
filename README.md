@@ -23,6 +23,7 @@ Copiar `.env.example` a `.env.local` y completar:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_STORAGE_BUCKET`
+- `ENABLE_CV_UPLOAD=false`
 - `ENABLE_MATCHING=false`
 - `ENABLE_AUTO_EMAIL=false`
 - `MATCHING_THRESHOLD=70`
@@ -59,6 +60,7 @@ Aplicar en orden:
 3. `supabase/seed.sql`
 
 Nota: la postulación pública se inserta por API server usando **service role**, no directo desde cliente por RLS.
+La carga de CV usa `/api/applications/upload-cv` y solo se habilita con `ENABLE_CV_UPLOAD=true`.
 
 ## Tests
 
@@ -81,5 +83,5 @@ Incluye validaciones, filtros, guards, mapper y UI básica.
 
 - Matching avanzado por skills + seniority + ponderaciones.
 - Emails automáticos reales con Resend/Brevo detrás de feature flags.
-- Cambio de estado de postulaciones desde UI admin.
-- Gestión completa de roles admin/recruiter desde panel.
+- Notificaciones automáticas por cambios de estado de postulaciones.
+- Auditoría de cambios de roles admin/recruiter.

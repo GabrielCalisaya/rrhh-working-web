@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/Input";
 import type { Vacancy, VacancyFilters } from "@/lib/types";
-import { filterVacancies } from "@/lib/services/vacancies";
+import { filterVacancies } from "@/lib/utils/vacancies";
 import { JobCard } from "@/components/jobs/JobCard";
 
 function getUniqueValues<T extends keyof Vacancy>(vacancies: Vacancy[], key: T): Vacancy[T][] {

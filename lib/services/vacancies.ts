@@ -1,7 +1,8 @@
-import type { Vacancy, VacancyFilters } from "@/lib/types";
+import type { Vacancy } from "@/lib/types";
 import { toSlug } from "@/lib/utils/format";
 import { getSupabaseServiceRoleClient } from "@/lib/supabase/server";
 import type { VacancyInput, VacancyUpdateInput } from "@/lib/validators/vacancy";
+export { filterVacancies } from "@/lib/utils/vacancies";
 
 export function mapVacancyRow(row: Record<string, unknown>): Vacancy {
   return {
@@ -19,32 +20,6 @@ export function mapVacancyRow(row: Record<string, unknown>): Vacancy {
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),
   };
-}
-
-export function filterVacancies(vacancies: Vacancy[], filters: VacancyFilters): Vacancy[] {
-  return vacancies.filter((vacancy) => {
-    if (filters.city && vacancy.city.toLowerCase() !== filters.city.toLowerCase()) {
-      return false;
-    }
-
-    if (filters.modality && vacancy.modality !== filters.modality) {
-      return false;
-    }
-
-    if (filters.seniority && vacancy.seniority !== filters.seniority) {
-      return false;
-    }
-
-    if (filters.query) {
-      const query = filters.query.toLowerCase();
-      const searchable = `${vacancy.title} ${vacancy.description} ${vacancy.requirements.join(" ")}`.toLowerCase();
-      if (!searchable.includes(query)) {
-        return false;
-      }
-    }
-
-    return true;
-  });
 }
 
 export async function listOpenVacancies() {

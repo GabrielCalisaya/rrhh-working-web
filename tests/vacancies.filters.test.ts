@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterVacancies } from "@/lib/services/vacancies";
+import { filterVacancies } from "@/lib/utils/vacancies";
 import type { Vacancy } from "@/lib/types";
 
 const baseVacancy: Vacancy = {
