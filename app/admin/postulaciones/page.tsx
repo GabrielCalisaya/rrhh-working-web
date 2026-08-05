@@ -1,6 +1,7 @@
 import { requireStaffAccess } from "@/lib/auth/guards";
-import { getSupabaseServiceRoleClient } from "@/lib/supabase/server";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { ApplicationsManager, type AdminApplicationItem } from "@/components/admin/ApplicationsManager";
+import { PAGE_SIZE, Pagination, pageRange, parsePage } from "@/components/ui/Pagination";
 import type { ApplicationStatus } from "@/lib/types";
 
 type CandidateInfo = {
@@ -15,6 +16,8 @@ type VacancyInfo = {
 type ApplicationRow = {
   id: string;
   status: ApplicationStatus;
+  cv_file_path: string | null;
+  applicant_full_name: string | null;
   candidates: CandidateInfo | CandidateInfo[] | null;
   vacancies: VacancyInfo | VacancyInfo[] | null;
 };
@@ -26,13 +29,25 @@ function getSingleItem<T>(value: T | T[] | null): T | null {
   return value;
 }
 
-export default async function AdminPostulacionesPage() {
+export default async function AdminPostulacionesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   await requireStaffAccess();
-  const supabase = getSupabaseServiceRoleClient();
-  const { data: applicationsRaw } = await supabase
+
+  const page = parsePage((await searchParams).page);
+  const { from, to } = pageRange(page);
+
+  // RLS: "staff manage applications" + "staff read candidates" + "vacancies staff manage".
+  const supabase = await getSupabaseServerClient();
+  const { data: applicationsRaw, count } = await supabase
     .from("applications")
-    .select("id,status,created_at,vacancies(title),candidates(full_name,email)")
-    .order("created_at", { ascending: false });
+    .select("id,status,created_at,cv_file_path,applicant_full_name,vacancies(title),candidates(full_name,email)", {
+      count: "exact",
+    })
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
   const applications = (applicationsRaw ?? []) as ApplicationRow[];
   const normalizedApplications: AdminApplicationItem[] = applications.map((application) => {
@@ -43,8 +58,11 @@ export default async function AdminPostulacionesPage() {
       id: application.id,
       status: application.status,
       vacancyTitle: vacancy?.title ?? "Vacante",
-      candidateName: candidate?.full_name ?? "Candidato",
+      // Se prioriza el nombre declarado en esta postulación sobre el de la ficha
+      // del candidato, que queda congelado en su primera postulación.
+      candidateName: application.applicant_full_name ?? candidate?.full_name ?? "Candidato",
       candidateEmail: candidate?.email ?? "",
+      hasCv: Boolean(application.cv_file_path),
     };
   });
 
@@ -52,6 +70,7 @@ export default async function AdminPostulacionesPage() {
     <section className="space-y-4">
       <h1 className="text-2xl font-semibold">Postulaciones</h1>
       <ApplicationsManager initialApplications={normalizedApplications} />
+      <Pagination basePath="/admin/postulaciones" page={page} total={count ?? 0} pageSize={PAGE_SIZE} />
     </section>
   );
 }

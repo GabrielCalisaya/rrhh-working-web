@@ -1,26 +1,29 @@
+import "server-only";
+
 import { redirect } from "next/navigation";
 import type { AppRole } from "@/lib/types";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getStaffSession } from "@/lib/auth/session";
 
 export function hasRequiredRole(role: AppRole | null, allowedRoles: AppRole[]) {
   return role ? allowedRoles.includes(role) : false;
 }
 
+/**
+ * Guard de las páginas de /admin.
+ *
+ * Usa getStaffSession(), memoizada con cache() de React: llamarla en el layout y
+ * otra vez en la página no duplica las consultas a Supabase.
+ */
 export async function requireStaffAccess(allowedRoles: AppRole[] = ["admin", "recruiter"]) {
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getStaffSession();
 
-  if (!user) {
+  if (!session) {
     redirect("/");
   }
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-
-  if (!hasRequiredRole((profile?.role as AppRole | null) ?? null, allowedRoles)) {
+  if (!hasRequiredRole(session.role, allowedRoles)) {
     redirect("/");
   }
 
-  return user;
+  return session.user;
 }

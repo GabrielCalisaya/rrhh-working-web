@@ -1,89 +1,119 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Input } from "@/components/ui/Input";
-import type { Vacancy, VacancyFilters } from "@/lib/types";
-import { filterVacancies } from "@/lib/utils/vacancies";
-import { JobCard } from "@/components/jobs/JobCard";
+import type { VacancyFilters } from "@/lib/types";
 
-function getUniqueValues<T extends keyof Vacancy>(vacancies: Vacancy[], key: T): Vacancy[T][] {
-  return [...new Set(vacancies.map((item) => item[key]))];
-}
+type Facets = {
+  cities: string[];
+  modalities: string[];
+  seniorities: string[];
+};
 
-export function JobsFilterBar({ vacancies }: { vacancies: Vacancy[] }) {
-  const [filters, setFilters] = useState<VacancyFilters>({});
+type Props = {
+  filters: VacancyFilters;
+  facets: Facets;
+  resultCount: number;
+};
 
-  const filtered = useMemo(() => filterVacancies(vacancies, filters), [vacancies, filters]);
-
-  const cities = getUniqueValues(vacancies, "city");
-  const modalities = getUniqueValues(vacancies, "modality");
-  const seniorities = getUniqueValues(vacancies, "seniority");
+/**
+ * Barra de filtros como formulario GET.
+ *
+ * Ahora es un Server Component: el estado vive en la URL, no en useState. Antes
+ * los filtros eran estado de cliente, así que un resultado filtrado no se podía
+ * compartir por link, no sobrevivía a un refresh y no era indexable — todo
+ * relevante para un portal de empleos. Además el filtrado ocurre en Postgres,
+ * no en memoria del navegador.
+ *
+ * Sin JavaScript también funciona: es un form nativo.
+ */
+export function JobsFilterBar({ filters, facets, resultCount }: Props) {
+  const hasFilters = Boolean(filters.city || filters.modality || filters.seniority || filters.query);
 
   return (
-    <section className="space-y-6">
+    <form method="get" action="/empleos" className="space-y-4">
       <div className="grid gap-3 md:grid-cols-4">
-        <Input
-          placeholder="Buscar por texto"
-          value={filters.query ?? ""}
-          onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
-        />
+        <div>
+          <label htmlFor="q" className="sr-only">
+            Buscar por texto
+          </label>
+          <Input id="q" name="q" defaultValue={filters.query ?? ""} placeholder="Buscar por texto" />
+        </div>
 
-        <select
-          className="rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
-          value={filters.city ?? ""}
-          onChange={(event) => setFilters((current) => ({ ...current, city: event.target.value || undefined }))}
-        >
-          <option value="">Todas las ciudades</option>
-          {cities.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="ciudad" className="sr-only">
+            Ciudad
+          </label>
+          <select
+            id="ciudad"
+            name="ciudad"
+            defaultValue={filters.city ?? ""}
+            className="w-full rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+          >
+            <option value="">Todas las ciudades</option>
+            {facets.cities.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
-          value={filters.modality ?? ""}
-          onChange={(event) =>
-            setFilters((current) => ({
-              ...current,
-              modality: (event.target.value as Vacancy["modality"]) || undefined,
-            }))
-          }
-        >
-          <option value="">Todas las modalidades</option>
-          {modalities.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="modalidad" className="sr-only">
+            Modalidad
+          </label>
+          <select
+            id="modalidad"
+            name="modalidad"
+            defaultValue={filters.modality ?? ""}
+            className="w-full rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+          >
+            <option value="">Todas las modalidades</option>
+            {facets.modalities.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
-          value={filters.seniority ?? ""}
-          onChange={(event) =>
-            setFilters((current) => ({
-              ...current,
-              seniority: (event.target.value as Vacancy["seniority"]) || undefined,
-            }))
-          }
-        >
-          <option value="">Todas las seniorities</option>
-          {seniorities.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="seniority" className="sr-only">
+            Seniority
+          </label>
+          <select
+            id="seniority"
+            name="seniority"
+            defaultValue={filters.seniority ?? ""}
+            className="w-full rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+          >
+            <option value="">Todas las seniorities</option>
+            {facets.seniorities.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className="grid gap-4">
-        {filtered.length === 0 ? <p className="text-sm">No se encontraron vacantes con esos filtros.</p> : null}
-        {filtered.map((vacancy) => (
-          <JobCard key={vacancy.id} vacancy={vacancy} />
-        ))}
+      <div className="flex flex-wrap items-center gap-4">
+        <button
+          type="submit"
+          className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-dark)]"
+        >
+          Filtrar
+        </button>
+
+        {hasFilters ? (
+          <Link href="/empleos" className="text-sm text-[var(--color-primary-dark)] hover:underline">
+            Limpiar filtros
+          </Link>
+        ) : null}
+
+        <p className="text-sm text-[var(--color-primary-dark)]" aria-live="polite">
+          {resultCount === 1 ? "1 búsqueda abierta" : `${resultCount} búsquedas abiertas`}
+        </p>
       </div>
-    </section>
+    </form>
   );
 }

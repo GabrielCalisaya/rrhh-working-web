@@ -1,21 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { applicationSchema } from "@/lib/validators/application";
+import { TurnstileWidget } from "@/components/security/TurnstileWidget";
 
 type ApplyFormProps = {
   vacancyId: string;
+  vacancyTitle: string;
 };
 
-export function ApplyForm({ vacancyId }: ApplyFormProps) {
+type FormStatus = "idle" | "success" | "error";
+
+export function ApplyForm({ vacancyId, vacancyTitle }: ApplyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<FormStatus>("idle");
   const [message, setMessage] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
+  // useCallback: sin esto la referencia cambia en cada render y el widget se
+  // vuelve a montar en loop por la dependencia del useEffect.
+  const handleCaptchaToken = useCallback((token: string | null) => {
+    setCaptchaToken(token);
+  }, []);
 
   async function uploadCv(file: File) {
     const uploadPayload = new FormData();
     uploadPayload.append("file", file);
+    uploadPayload.append("vacancyId", vacancyId);
+    if (captchaToken) {
+      uploadPayload.append("captchaToken", captchaToken);
+    }
 
     const uploadResponse = await fetch("/api/applications/upload-cv", {
       method: "POST",
@@ -32,16 +48,17 @@ export function ApplyForm({ vacancyId }: ApplyFormProps) {
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
+    setStatus("idle");
     setMessage(null);
 
-    const uploadedFile = formData.get("cvFile");
-    const existingCvPath = String(formData.get("cvFilePath") ?? "").trim();
-    let cvFilePath: string | undefined = existingCvPath || undefined;
+    let cvFilePath: string | undefined;
 
+    const uploadedFile = formData.get("cvFile");
     if (uploadedFile instanceof File && uploadedFile.size > 0) {
       try {
         cvFilePath = await uploadCv(uploadedFile);
       } catch (error) {
+        setStatus("error");
         setMessage((error as Error).message);
         setIsSubmitting(false);
         return;
@@ -69,6 +86,7 @@ export function ApplyForm({ vacancyId }: ApplyFormProps) {
 
     const result = applicationSchema.safeParse(payload);
     if (!result.success) {
+      setStatus("error");
       setMessage(result.error.issues[0]?.message ?? "Datos inválidos");
       setIsSubmitting(false);
       return;
@@ -77,56 +95,92 @@ export function ApplyForm({ vacancyId }: ApplyFormProps) {
     const response = await fetch("/api/applications", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(result.data),
+      // El token va fuera del schema: Zod lo descartaría al parsear en el server.
+      body: JSON.stringify({ ...result.data, captchaToken }),
     });
 
     const data = (await response.json()) as { error?: string; message?: string };
 
-    setMessage(data.message ?? data.error ?? "Postulación enviada");
+    if (!response.ok) {
+      setStatus("error");
+      setMessage(data.error ?? "No se pudo enviar la postulación");
+      setIsSubmitting(false);
+      return;
+    }
+
+    setStatus("success");
+    setMessage(data.message ?? "Postulación enviada correctamente");
     setIsSubmitting(false);
+  }
+
+  if (status === "success") {
+    return (
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center shadow-sm">
+        <p className="text-lg font-semibold text-emerald-900">¡Postulación enviada!</p>
+        <p className="mt-2 text-sm text-emerald-800">
+          Recibimos tu postulación para <strong>{vacancyTitle}</strong>. Te contactaremos si avanzás en el proceso.
+        </p>
+      </div>
+    );
   }
 
   return (
     <form
       action={handleSubmit}
-      className="grid gap-4 rounded-lg border border-[var(--color-accent)] bg-white p-6 shadow-sm"
+      className="grid gap-5 rounded-xl border border-[var(--color-accent)] bg-white p-6 shadow-sm"
       aria-label="Formulario de postulación"
     >
-      <div className="grid gap-2 md:grid-cols-2 md:gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label htmlFor="fullName" className="mb-1 block text-sm font-medium">
-            Nombre completo
+            Nombre completo *
           </label>
-          <Input id="fullName" name="fullName" required />
+          <Input id="fullName" name="fullName" required placeholder="Ej. Ana Pérez" />
         </div>
         <div>
           <label htmlFor="email" className="mb-1 block text-sm font-medium">
-            Email
+            Email *
           </label>
-          <Input id="email" name="email" type="email" required />
+          <Input id="email" name="email" type="email" required placeholder="tu@email.com" />
         </div>
       </div>
 
-      <div className="grid gap-2 md:grid-cols-2 md:gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label htmlFor="city" className="mb-1 block text-sm font-medium">
             Ciudad
           </label>
-          <Input id="city" name="city" />
+          <Input id="city" name="city" placeholder="Ej. Córdoba" />
         </div>
         <div>
           <label htmlFor="phone" className="mb-1 block text-sm font-medium">
             Teléfono
           </label>
-          <Input id="phone" name="phone" />
+          <Input id="phone" name="phone" placeholder="Ej. 351 555 1234" />
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label htmlFor="linkedinUrl" className="mb-1 block text-sm font-medium">
+            LinkedIn
+          </label>
+          <Input id="linkedinUrl" name="linkedinUrl" type="url" placeholder="https://linkedin.com/in/..." />
+        </div>
+        <div>
+          <label htmlFor="portfolioUrl" className="mb-1 block text-sm font-medium">
+            Portfolio
+          </label>
+          <Input id="portfolioUrl" name="portfolioUrl" type="url" placeholder="https://..." />
         </div>
       </div>
 
       <div>
         <label htmlFor="skills" className="mb-1 block text-sm font-medium">
-          Skills (separadas por coma)
+          Skills (separadas por coma) *
         </label>
-        <Input id="skills" name="skills" required />
+        <Input id="skills" name="skills" required placeholder="React, TypeScript, Testing" />
+        <p className="mt-1 text-xs text-[var(--color-primary-dark)]">Usá las mismas palabras que aparecen en los requisitos de la vacante.</p>
       </div>
 
       <div>
@@ -136,7 +190,8 @@ export function ApplyForm({ vacancyId }: ApplyFormProps) {
         <textarea
           id="coverLetter"
           name="coverLetter"
-          className="min-h-24 w-full rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+          className="min-h-28 w-full rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          placeholder="Contanos brevemente por qué te interesa este rol..."
         />
       </div>
 
@@ -144,26 +199,33 @@ export function ApplyForm({ vacancyId }: ApplyFormProps) {
         <label htmlFor="cvFile" className="mb-1 block text-sm font-medium">
           CV en PDF (opcional)
         </label>
-        <Input id="cvFile" name="cvFile" type="file" accept="application/pdf" />
+        <Input id="cvFile" name="cvFile" type="file" accept="application/pdf,.pdf" />
+        <p className="mt-1 text-xs text-[var(--color-primary-dark)]">Máximo 5 MB. Solo archivos PDF.</p>
       </div>
 
-      <div>
-        <label htmlFor="cvFilePath" className="mb-1 block text-sm font-medium">
-          Ruta CV en Storage (opcional/manual)
-        </label>
-        <Input id="cvFilePath" name="cvFilePath" placeholder="cvs/archivo.pdf" />
-      </div>
-
-      <label className="flex items-center gap-2 text-sm">
-        <input name="consent" type="checkbox" required />
-        Acepto el tratamiento de mis datos para procesos de selección.
+      <label className="flex items-start gap-3 rounded-md border border-[var(--color-accent)] bg-[var(--color-background)] p-3 text-sm">
+        <input name="consent" type="checkbox" required className="mt-1" />
+        <span>
+          Acepto el tratamiento de mis datos personales para procesos de selección de RRHH Working. Conservamos tus
+          datos 12 meses desde tu última postulación y podés pedir su eliminación cuando quieras. Ver{" "}
+          <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="underline">
+            política de privacidad
+          </a>
+          .
+        </span>
       </label>
 
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Enviando..." : "Enviar postulación"}
-      </Button>
+      <TurnstileWidget onToken={handleCaptchaToken} />
 
-      {message ? <p className="text-sm text-[var(--color-primary-dark)]">{message}</p> : null}
+      {status === "error" && message ? (
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+          {message}
+        </p>
+      ) : null}
+
+      <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
+        {isSubmitting ? "Enviando postulación..." : "Enviar postulación"}
+      </Button>
     </form>
   );
 }

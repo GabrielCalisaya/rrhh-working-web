@@ -9,6 +9,7 @@ export type AdminApplicationItem = {
   vacancyTitle: string;
   candidateName: string;
   candidateEmail: string;
+  hasCv: boolean;
 };
 
 type ApplicationsManagerProps = {
@@ -18,6 +19,30 @@ type ApplicationsManagerProps = {
 export function ApplicationsManager({ initialApplications }: ApplicationsManagerProps) {
   const [applications, setApplications] = useState(initialApplications);
   const [message, setMessage] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  /**
+   * La URL firmada dura 60 segundos y se pide recién al hacer click, para que
+   * no quede enlazada en el HTML de la página ni en el historial del navegador.
+   */
+  async function downloadCv(applicationId: string) {
+    setMessage(null);
+    setDownloadingId(applicationId);
+
+    try {
+      const response = await fetch(`/api/applications/cv?applicationId=${encodeURIComponent(applicationId)}`);
+      const result = (await response.json()) as { data?: { url: string }; error?: string };
+
+      if (!response.ok || !result.data?.url) {
+        setMessage(result.error ?? "No se pudo obtener el CV");
+        return;
+      }
+
+      window.open(result.data.url, "_blank", "noopener,noreferrer");
+    } finally {
+      setDownloadingId(null);
+    }
+  }
 
   async function updateStatus(id: string, status: ApplicationStatus) {
     setMessage(null);
@@ -63,6 +88,19 @@ export function ApplicationsManager({ initialApplications }: ApplicationsManager
                 <option value="rejected">rejected</option>
                 <option value="hired">hired</option>
               </select>
+
+              {application.hasCv ? (
+                <button
+                  type="button"
+                  onClick={() => downloadCv(application.id)}
+                  disabled={downloadingId === application.id}
+                  className="rounded-md border border-[var(--color-primary)] px-2 py-1 text-xs font-semibold text-[var(--color-primary-dark)] hover:bg-[var(--color-accent)] disabled:opacity-60"
+                >
+                  {downloadingId === application.id ? "Generando..." : "Ver CV"}
+                </button>
+              ) : (
+                <span className="text-xs text-[var(--color-primary-dark)]">Sin CV</span>
+              )}
             </div>
           </article>
         ))}

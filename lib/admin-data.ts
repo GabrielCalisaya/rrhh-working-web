@@ -1,7 +1,13 @@
-import { getSupabaseServiceRoleClient } from "@/lib/supabase/server";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
+/**
+ * Contadores del dashboard.
+ *
+ * Con el cliente del usuario, cada uno cuenta lo que RLS le deja ver. Antes
+ * usaba service_role y contaba todo sin importar el rol.
+ */
 export async function getAdminSummary() {
-  const supabase = getSupabaseServiceRoleClient();
+  const supabase = await getSupabaseServerClient();
 
   const [{ count: vacancies }, { count: candidates }, { count: applications }] = await Promise.all([
     supabase.from("vacancies").select("id", { count: "exact", head: true }),

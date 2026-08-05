@@ -1,6 +1,15 @@
 create extension if not exists "pgcrypto";
 
-create type app_role as enum ('admin', 'recruiter');
+-- `create type` no admite IF NOT EXISTS, así que se envuelve para que el script
+-- pueda re-ejecutarse. Sin esto falla con 42710 en cualquier base donde el tipo
+-- ya exista.
+do $enum$
+begin
+  if not exists (select 1 from pg_type where typname = 'app_role') then
+    create type app_role as enum ('admin', 'recruiter');
+  end if;
+end
+$enum$;
 
 create table if not exists profiles (
   id uuid primary key references auth.users(id) on delete cascade,

@@ -15,7 +15,10 @@ export const applicationSchema = z.object({
     consent: z.literal(true),
   }),
   coverLetter: z.string().max(2000).optional().or(z.literal("")),
-  cvFilePath: z.string().optional(),
+  cvFilePath: z
+    .string()
+    .regex(/^cvs\/[0-9a-f-]+\.pdf$/i, "Ruta de CV inválida")
+    .optional(),
 });
 
 export const applicationStatusUpdateSchema = z.object({

@@ -3,8 +3,12 @@ name: CI
 on:
   pull_request:
   push:
-    branches-ignore:
-      - main
+    branches: [main]
+
+# Cancela corridas viejas de la misma rama en vez de encolarlas.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
@@ -15,7 +19,24 @@ jobs:
         with:
           node-version: 20
           cache: npm
+
       - run: npm ci
+
+      # Separado del build: un error de tipos se distingue de un error de compilación.
+      - name: Typecheck
+        run: npx tsc --noEmit
+
       - run: npm run lint
+
       - run: npm run test
-      - run: npm run build
+
+      - name: Build
+        run: npm run build
+        env:
+          # Placeholders: el build no consulta Supabase (todo se resuelve en
+          # request time), pero los módulos leen las variables al construir el
+          # cliente. Los valores reales van en Vercel.
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-key
+          SUPABASE_STORAGE_BUCKET: cvs

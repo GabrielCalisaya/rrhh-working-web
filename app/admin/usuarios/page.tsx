@@ -1,12 +1,17 @@
 import { requireStaffAccess } from "@/lib/auth/guards";
-import { getSupabaseServiceRoleClient } from "@/lib/supabase/server";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { UsersRolesManager } from "@/components/admin/UsersRolesManager";
 import type { AppRole } from "@/lib/types";
 
 export default async function AdminUsuariosPage() {
   await requireStaffAccess(["admin"]);
-  const supabase = getSupabaseServiceRoleClient();
-  const { data: profiles } = await supabase.from("profiles").select("id,full_name,role,created_at").order("created_at");
+  // RLS: "staff manage profiles" solo deja a admin ver todos los perfiles.
+  const supabase = await getSupabaseServerClient();
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id,full_name,role,created_at")
+    .order("created_at")
+    .limit(200);
 
   return (
     <section className="space-y-4">

@@ -1,32 +1,18 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
-import { getSupabaseServerClient, getSupabaseServiceRoleClient } from "@/lib/supabase/server";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { profileRoleUpdateSchema } from "@/lib/validators/profile";
-import type { AppRole } from "@/lib/types";
-
-async function getCurrentUserRole() {
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return null;
-  }
-
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  return { userId: user.id, role: (profile?.role as AppRole | null) ?? null };
-}
+import { requireStaffApi } from "@/lib/auth/api-guards";
+import { errorResponse } from "@/lib/api/respond";
+import { recordAudit } from "@/lib/observability/audit";
 
 export async function PATCH(request: Request) {
   try {
-    const currentUser = await getCurrentUserRole();
-    if (!currentUser || currentUser.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
+    const staff = await requireStaffApi(["admin"]);
     const payload = profileRoleUpdateSchema.parse(await request.json());
-    const supabase = getSupabaseServiceRoleClient();
+
+    // Cambiar roles con el cliente del usuario: RLS ("staff manage profiles",
+    // solo admin) valida de nuevo lo que ya validó requireStaffApi(["admin"]).
+    const supabase = await getSupabaseServerClient();
     const { data, error } = await supabase
       .from("profiles")
       .update({ role: payload.role })
@@ -35,14 +21,21 @@ export async function PATCH(request: Request) {
       .single();
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error(`profiles.update falló: ${error.message}`);
     }
+
+    // Escalada de privilegios: es lo primero que se mira en un incidente.
+    await recordAudit({
+      action: "role.changed",
+      actorId: staff.userId,
+      actorRole: staff.role,
+      targetType: "profile",
+      targetId: payload.id,
+      metadata: { newRole: payload.role },
+    });
 
     return NextResponse.json({ data });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues[0]?.message ?? "Payload inválido" }, { status: 400 });
-    }
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    return errorResponse(error, "PATCH /api/admin/users");
   }
 }

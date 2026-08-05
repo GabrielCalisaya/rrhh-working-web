@@ -1,0 +1,22 @@
+# Normaliza finales de línea en el repositorio.
+#
+# Sin esto, `git status` reportaba 67 archivos y ~11.000 líneas "modificadas"
+# que eran solo CRLF vs LF. Eso envenena todos los diffs y hace que ningún code
+# review sea confiable.
+#
+# Después de agregar este archivo, correr una vez para renormalizar el índice:
+#   git add --renormalize .
+#   git commit -m "chore: normalizar finales de línea"
+
+* text=auto eol=lf
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.woff  binary
+*.woff2 binary
+
+package-lock.json -diff linguist-generated

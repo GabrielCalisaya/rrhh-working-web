@@ -1,3 +1,5 @@
+// Perfiles confirmados por el cliente. El portafolio menciona además LinkedIn y
+// CompuTrabajo como canales de difusión de búsquedas, pero sin usuario asociado.
 const SOCIAL_LINKS = [
   {
     label: "Facebook",
