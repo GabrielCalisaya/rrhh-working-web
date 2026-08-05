@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BRAND } from "@/lib/content/institucional";
+
+/**
+ * Inter, la tipografía que `globals.css` ya asumía pero que nunca se cargaba.
+ *
+ * `next/font` la auto-hospeda en el propio dominio durante el build, así que no
+ * hace falta tocar la CSP (`font-src 'self'` la cubre) ni se agrega una request
+ * a un tercero. `display: swap` evita el texto invisible mientras carga.
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 const DESCRIPTION =
   "Consultora de Recursos Humanos en San Salvador de Jujuy. Reclutamiento y selección de personal, difusión de ofertas laborales, armado de CV y optimización de perfiles profesionales.";
@@ -45,7 +59,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es-AR" className="h-full antialiased">
+    <html lang="es-AR" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full bg-[var(--color-background)] text-[var(--color-text)]">
         <a
           href="#contenido"

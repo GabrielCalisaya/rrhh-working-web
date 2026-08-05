@@ -1,23 +1,305 @@
 @import "tailwindcss";
 
+/* ===========================================================================
+   TOKENS
+   ---------------------------------------------------------------------------
+   Convención de nombres:
+
+   - `--color-*` mantiene los nombres que ya usaban los componentes, para no
+     tener que tocar cada archivo. No colisiona con Tailwind v4, cuyos colores
+     se llaman `--color-slate-500`, `--color-red-500`, etc.
+
+   - El resto usa prefijo `--rw-` a propósito. Tailwind v4 define en `:root`
+     variables con los namespaces `--text-*`, `--radius-*`, `--shadow-*`,
+     `--ease-*` y `--spacing-*`. Si declaráramos `--radius-lg` o `--shadow-sm`
+     acá, estaríamos pisando silenciosamente TODAS las utilidades `rounded-lg`
+     y `shadow-sm` del sitio. El prefijo evita ese choque.
+   =========================================================================== */
+
 :root {
-  --color-primary: #7c9a9d;
-  --color-primary-dark: #5f7c80;
-  --color-background: #f5f5f4;
-  --color-text: #1f2937;
+  /* -------------------------------------------------------------------------
+     Marca
+     ---------------------------------------------------------------------------
+     `--color-primary` es el verde-gris de la identidad. Se conserva exacto,
+     pero pasa a usarse solo como color DECORATIVO (iconos, bordes, detalles):
+     sobre blanco da 3.01:1, suficiente para elementos gráficos pero no para
+     texto ni para fondos con texto blanco encima.
+
+     `--color-primary-dark` se oscureció lo mínimo indispensable (#5f7c80 →
+     #5a7579, apenas un 5%) para cruzar el umbral de WCAG AA. Es el color con
+     el que está pintado casi todo el texto de párrafo del sitio, y el valor
+     anterior daba 4.49:1 sobre blanco — a una centésima del mínimo de 4.5:1.
+
+     El valor se eligió midiendo contra las DOS superficies sobre las que ese
+     texto aparece realmente, no solo contra blanco: dentro de las tarjetas
+     (#ffffff) y directo sobre el fondo de página (#f5f5f4), que es el caso más
+     exigente. Verificar solo contra blanco daba un falso positivo: pasaba en
+     las tarjetas y seguía fallando en los párrafos de "Quiénes somos".
+
+     `--color-primary-strong` es el tono para fondos sólidos con texto blanco
+     y para texto sobre superficies teñidas (badges).
+     ------------------------------------------------------------------------- */
+  --color-primary: #7c9a9d;        /* 3.01:1 — decorativo (iconos, bordes)  */
+  --color-primary-dark: #5a7579;   /* 4.93:1 blanco · 4.52:1 fondo — AA ✓   */
+  --color-primary-strong: #4c6669; /* 6.16:1 blanco · 5.14:1 accent-soft ✓  */
+
   --color-accent: #c8d4d6;
+  --color-accent-soft: #e5ecec;
+
+  /* -------------------------------------------------------------------------
+     Superficies
+     ------------------------------------------------------------------------- */
+  --color-background: #f5f5f4;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #fbfbfa;
+  --color-border: #dde5e6;
+  --color-border-strong: #c8d4d6;
+
+  /* -------------------------------------------------------------------------
+     Texto
+     ---------------------------------------------------------------------------
+     `--color-text-muted` es un gris neutro derivado de `--color-text`, no un
+     verde apagado. Sirve para el texto secundario que hoy usa el color de
+     marca: da jerarquía real (14.7:1 → 7.6:1 → 4.6:1) en vez de teñir todo
+     del mismo tono. Se aplicará a las páginas en la Etapa 1.
+     ------------------------------------------------------------------------- */
+  --color-text: #1f2937;       /* 14.7:1 — títulos y cuerpo principal */
+  --color-text-muted: #4b5563; /*  7.6:1 — texto secundario           */
+
+  /* -------------------------------------------------------------------------
+     Elevación
+     ---------------------------------------------------------------------------
+     Sombras tintadas con el matiz de la marca en lugar de negro puro: sobre un
+     fondo cálido como `--color-background`, el negro al 10% se ve sucio y gris.
+     Cada nivel combina una sombra de contacto (corta, define el borde) con una
+     difusa (larga, da la altura). Eso es lo que separa una sombra que se lee
+     como profundidad de una que se lee como mancha.
+     ------------------------------------------------------------------------- */
+  --rw-shadow-xs: 0 1px 2px rgba(31, 47, 51, 0.05);
+  --rw-shadow-sm: 0 1px 2px rgba(31, 47, 51, 0.05), 0 2px 6px rgba(31, 47, 51, 0.04);
+  --rw-shadow-md: 0 2px 4px rgba(31, 47, 51, 0.05), 0 8px 20px rgba(31, 47, 51, 0.07);
+  --rw-shadow-lg: 0 4px 8px rgba(31, 47, 51, 0.05), 0 16px 36px rgba(31, 47, 51, 0.09);
+  --rw-shadow-ring: 0 0 0 1px rgba(124, 154, 157, 0.18);
+
+  /* -------------------------------------------------------------------------
+     Radios
+     ------------------------------------------------------------------------- */
+  --rw-radius-sm: 0.375rem;
+  --rw-radius-md: 0.625rem;
+  --rw-radius-lg: 0.875rem;
+  --rw-radius-xl: 1.25rem;
+  --rw-radius-pill: 999px;
+
+  /* -------------------------------------------------------------------------
+     Ritmo vertical
+     ---------------------------------------------------------------------------
+     Hoy cada página inventa su separación (gap-12, space-y-14, space-y-8,
+     space-y-6). Estos dos valores son la escala única a la que van a migrar en
+     la Etapa 1. Son fluidos: en mobile comprimen, en desktop respiran.
+     ------------------------------------------------------------------------- */
+  --rw-space-section: clamp(3.5rem, 7vw, 6rem); /* entre secciones mayores */
+  --rw-space-block: clamp(1.5rem, 3vw, 2.5rem); /* entre bloques internos  */
+
+  /* -------------------------------------------------------------------------
+     Movimiento
+     ---------------------------------------------------------------------------
+     Duraciones cortas y curvas de salida (arranca rápido, frena suave). Es lo
+     que hace que una transición se lea como profesional en vez de perezosa o
+     rebotada. Nada por encima de 500ms, nada con rebote.
+     ------------------------------------------------------------------------- */
+  --rw-duration-fast: 150ms;
+  --rw-duration-base: 240ms;
+  --rw-duration-slow: 420ms;
+  --rw-ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --rw-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Altura aproximada del header sticky. La usa `scroll-padding-top`. */
+  --rw-header-offset: 6.5rem;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  /* Sin esto, cualquier ancla (#contenido, links internos) deja el destino
+     tapado por el header sticky. Es un bug de navegación real, no cosmético. */
+  scroll-padding-top: var(--rw-header-offset);
+}
+
 body {
   margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* `--font-inter` la inyecta next/font desde el layout raíz. El fallback queda
+     por si la fuente no llegara a cargar. */
+  font-family: var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Cifras de ancho fijo: evita que los contadores de resultados y las fechas
+     "salten" al cambiar de número. */
+  font-variant-numeric: tabular-nums;
+  text-rendering: optimizeLegibility;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* ===========================================================================
+   DETALLES TIPOGRÁFICOS
+   ---------------------------------------------------------------------------
+   Costo cero en rendimiento, efecto grande en percepción de calidad.
+   =========================================================================== */
+
+h1,
+h2,
+h3,
+h4 {
+  /* `balance` reparte las palabras entre líneas en vez de dejar una sola
+     colgando. Es la diferencia más visible entre un título maquetado y uno
+     compuesto. */
+  text-wrap: balance;
+  /* Inter necesita tracking negativo en tamaños grandes: por defecto se ve
+     suelta y pierde peso. */
+  letter-spacing: -0.02em;
+}
+
+p,
+li {
+  /* Evita líneas finales huérfanas de una sola palabra. */
+  text-wrap: pretty;
+}
+
+/* ===========================================================================
+   FOCO VISIBLE
+   ---------------------------------------------------------------------------
+   El anillo de foco del navegador es casi invisible sobre los fondos verdes de
+   la marca. `:focus-visible` (y no `:focus`) sólo lo muestra en navegación por
+   teclado, así que no molesta al usuario de mouse.
+
+   Se usa `outline` en vez de `box-shadow` a propósito: el outline no se recorta
+   con el `overflow` de las tarjetas.
+   =========================================================================== */
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary-strong);
+  outline-offset: 2px;
+  border-radius: var(--rw-radius-sm);
+}
+
+/* ===========================================================================
+   PRIMITIVAS DE ANIMACIÓN
+   ---------------------------------------------------------------------------
+   CSS puro, sin dependencias. Las clases `u-*` (de "utility") quedan
+   disponibles para las etapas siguientes; en esta etapa todavía no se aplican
+   a ninguna página.
+
+   Las traslaciones son cortas a propósito (16px). Un desplazamiento largo se
+   lee como plantilla genérica; uno corto se lee como refinamiento.
+   =========================================================================== */
+
+@keyframes rw-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes rw-fade-up {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes rw-scale-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes rw-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* --- Entrada inmediata (contenido visible al cargar, ej. el hero) --------- */
+
+.u-animate-in {
+  animation: rw-fade-up var(--rw-duration-slow) var(--rw-ease-emphasized) both;
+}
+
+.u-animate-fade {
+  animation: rw-fade-in var(--rw-duration-slow) var(--rw-ease-out) both;
+}
+
+.u-animate-scale {
+  animation: rw-scale-in var(--rw-duration-base) var(--rw-ease-emphasized) both;
+}
+
+/* --- Reveal al hacer scroll ----------------------------------------------
+   Resuelto con animaciones CSS guiadas por scroll (`animation-timeline: view()`)
+   en lugar de IntersectionObserver.
+
+   Tres razones concretas:
+
+   1. Cero JavaScript. No suma nada al bundle ni al hilo principal; el navegador
+      resuelve la animación en el compositor.
+   2. Cero riesgo de contenido invisible. Con un observer, el patrón habitual es
+      ocultar todo por CSS y revelar por JS — si el bundle falla o tarda, la
+      página queda en blanco. Acá el estado oculto SOLO existe dentro del
+      @supports: el navegador que no soporta la propiedad muestra el contenido
+      normal, sin fallback ni bandera `js` en el <html>.
+   3. Se reevalúa solo al navegar entre páginas, sin re-observar nodos.
+
+   `entry 5% cover 20%` hace que la animación termine apenas el elemento entró:
+   un rango largo obliga a scrollear para "terminar de ver" aparecer algo, que
+   es justo la sensación de web recargada que queremos evitar.
+-------------------------------------------------------------------------- */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .u-reveal {
+      animation: rw-fade-up both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 20%;
+    }
+  }
+}
+
+/* --- Skeleton ------------------------------------------------------------- */
+
+.u-skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-accent-soft) 0%,
+    var(--color-surface) 50%,
+    var(--color-accent-soft) 100%
+  );
+  background-size: 200% 100%;
+  animation: rw-shimmer 1.4s linear infinite;
+  border-radius: var(--rw-radius-sm);
+}
+
+/* ===========================================================================
+   MOVIMIENTO REDUCIDO
+   ---------------------------------------------------------------------------
+   Requisito de accesibilidad, y va ANTES de agregar cualquier animación al
+   sitio, no después. Para quien configuró su sistema para reducir movimiento,
+   todo se resuelve al estado final de forma instantánea: no se pierde ningún
+   contenido, sólo el desplazamiento.
+   =========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .u-skeleton {
+    animation: none;
+  }
 }

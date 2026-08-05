@@ -43,7 +43,7 @@ export function Pagination({ basePath, page, total, pageSize = PAGE_SIZE }: Prop
           <Link
             href={`${basePath}?page=${page - 1}`}
             rel="prev"
-            className="rounded-md border border-[var(--color-primary)] px-3 py-1.5 text-sm font-semibold text-[var(--color-primary-dark)] hover:bg-[var(--color-accent)]"
+            className="inline-flex min-h-11 items-center rounded-[var(--rw-radius-md)] border border-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-primary-dark)] transition-colors duration-[var(--rw-duration-fast)] hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-primary-strong)] md:min-h-10"
           >
             Anterior
           </Link>
@@ -61,7 +61,7 @@ export function Pagination({ basePath, page, total, pageSize = PAGE_SIZE }: Prop
           <Link
             href={`${basePath}?page=${page + 1}`}
             rel="next"
-            className="rounded-md border border-[var(--color-primary)] px-3 py-1.5 text-sm font-semibold text-[var(--color-primary-dark)] hover:bg-[var(--color-accent)]"
+            className="inline-flex min-h-11 items-center rounded-[var(--rw-radius-md)] border border-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-primary-dark)] transition-colors duration-[var(--rw-duration-fast)] hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-primary-strong)] md:min-h-10"
           >
             Siguiente
           </Link>

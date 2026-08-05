@@ -190,7 +190,7 @@ export function ApplyForm({ vacancyId, vacancyTitle }: ApplyFormProps) {
         <textarea
           id="coverLetter"
           name="coverLetter"
-          className="min-h-28 w-full rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          className="min-h-32 w-full rounded-[var(--rw-radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 py-2.5 text-base text-[var(--color-text)] outline-none transition-[border-color,box-shadow] duration-[var(--rw-duration-fast)] focus:border-[var(--color-primary-dark)] focus:ring-4 focus:ring-[var(--color-primary)]/20 md:text-sm"
           placeholder="Contanos brevemente por qué te interesa este rol..."
         />
       </div>

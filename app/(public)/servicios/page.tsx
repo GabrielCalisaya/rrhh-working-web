@@ -82,7 +82,7 @@ export default function ServiciosPage() {
                   <li key={step.title} className="relative">
                     {/* Marcador del timeline, centrado sobre la línea */}
                     <span
-                      className="absolute -left-[2.15rem] flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs font-semibold text-white md:-left-[2.65rem]"
+                      className="absolute -left-[2.15rem] flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-dark)] text-xs font-semibold text-white md:-left-[2.65rem]"
                       aria-hidden="true"
                     >
                       {offset + index + 1}

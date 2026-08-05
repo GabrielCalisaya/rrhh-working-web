@@ -65,7 +65,7 @@ export function StaffNav() {
       <li>
         <Link
           href="/admin"
-          className="rounded-md bg-[var(--color-primary)] px-3 py-1.5 text-white hover:bg-[var(--color-primary-dark)]"
+          className="inline-flex min-h-11 items-center rounded-[var(--rw-radius-md)] bg-[var(--color-primary-dark)] px-4 py-2 font-medium text-white transition-colors duration-[var(--rw-duration-fast)] hover:bg-[var(--color-primary-strong)] md:min-h-9"
         >
           Panel
         </Link>
