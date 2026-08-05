@@ -17,7 +17,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Node 22, no 20. En Node 20 los tests fallaban antes de arrancar con
+          # "webidl.util.markAsUncloneable is not a function": jsdom carga undici,
+          # que usa markAsUncloneable de node:worker_threads. Es también la
+          # versión con la que corre Vercel, así que CI y producción quedan
+          # alineados.
+          node-version: 22
           cache: npm
 
       - run: npm ci
