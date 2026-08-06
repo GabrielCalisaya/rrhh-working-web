@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useId, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Input } from "@/components/ui/Input";
 import { applicationSchema } from "@/lib/validators/application";
-import { TurnstileWidget } from "@/components/security/TurnstileWidget";
+import { TurnstileWidget, type TurnstileHandle } from "@/components/security/TurnstileWidget";
 
 type ApplyFormProps = {
   vacancyId: string;
@@ -38,6 +38,7 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
   const [message, setMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileHandle>(null);
 
   // Experiencia seleccionada por la persona.
   const [selected, setSelected] = useState<string[]>([]);
@@ -125,12 +126,12 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
     setCvFile(file);
   }
 
-  async function uploadCv(file: File) {
+  async function uploadCv(file: File, token: string | null) {
     const uploadPayload = new FormData();
     uploadPayload.append("file", file);
     uploadPayload.append("vacancyId", vacancyId);
-    if (captchaToken) {
-      uploadPayload.append("captchaToken", captchaToken);
+    if (token) {
+      uploadPayload.append("captchaToken", token);
     }
 
     const uploadResponse = await fetch("/api/applications/upload-cv", {
@@ -206,13 +207,25 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
       return;
     }
 
+    /**
+     * Cada petición necesita SU token: Cloudflare quema el token en la primera
+     * validación, así que subir el CV y crear la postulación —que son dos
+     * llamadas— no pueden compartirlo.
+     */
+    let token = captchaToken;
+
     if (cvFile) {
       try {
-        result.data.cvFilePath = await uploadCv(cvFile);
+        result.data.cvFilePath = await uploadCv(cvFile, token);
+        // Token nuevo para la petición siguiente.
+        token = await turnstileRef.current?.refresh() ?? null;
       } catch (error) {
         setStatus("error");
         setMessage((error as Error).message);
         setIsSubmitting(false);
+        // Sin esto, reintentar mandaría el token ya consumido y fallaría
+        // siempre, dejando el formulario trabado hasta recargar la página.
+        void turnstileRef.current?.refresh();
         return;
       }
     }
@@ -221,7 +234,7 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
       method: "POST",
       headers: { "Content-Type": "application/json" },
       // El token va fuera del schema: Zod lo descartaría al parsear en el server.
-      body: JSON.stringify({ ...result.data, captchaToken }),
+      body: JSON.stringify({ ...result.data, captchaToken: token }),
     });
 
     const data = (await response.json()) as { error?: string; message?: string };
@@ -230,6 +243,7 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
       setStatus("error");
       setMessage(data.error ?? "No se pudo enviar la postulación");
       setIsSubmitting(false);
+      void turnstileRef.current?.refresh();
       return;
     }
 
@@ -595,7 +609,7 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
         ) : null}
 
         <div className="mt-5">
-          <TurnstileWidget onToken={handleCaptchaToken} />
+          <TurnstileWidget ref={turnstileRef} onToken={handleCaptchaToken} />
         </div>
 
         {status === "error" && message ? (

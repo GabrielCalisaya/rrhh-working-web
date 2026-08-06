@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useId, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Input } from "@/components/ui/Input";
-import { TurnstileWidget } from "@/components/security/TurnstileWidget";
+import { TurnstileWidget, type TurnstileHandle } from "@/components/security/TurnstileWidget";
 import { CONTACT_SERVICE_OPTIONS, OTHER_SERVICE, contactSchema } from "@/lib/validators/contact";
 
 type Status = "idle" | "sending" | "success" | "error";
@@ -55,6 +55,7 @@ export function ContactForm() {
   const [service, setService] = useState<string>("");
   const [messageLength, setMessageLength] = useState(0);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileHandle>(null);
 
   // useCallback: sin esto la referencia cambia en cada render y el widget se
   // vuelve a montar en loop por la dependencia del useEffect.
@@ -125,6 +126,9 @@ export function ContactForm() {
       if (!response.ok) {
         setFormError(data.error ?? "No pudimos enviar tu consulta. Probá de nuevo.");
         setStatus("error");
+        // Token nuevo: el anterior ya lo consumió Cloudflare y reintentar con
+        // el mismo devolvería siempre "verificación fallida".
+        void turnstileRef.current?.refresh();
         return;
       }
 
@@ -132,6 +136,7 @@ export function ContactForm() {
     } catch {
       setFormError("No pudimos conectar con el servidor. Revisá tu conexión e intentá de nuevo.");
       setStatus("error");
+      void turnstileRef.current?.refresh();
     }
   }
 
@@ -325,7 +330,7 @@ export function ContactForm() {
         ) : null}
       </div>
 
-      <TurnstileWidget onToken={handleCaptchaToken} />
+      <TurnstileWidget ref={turnstileRef} onToken={handleCaptchaToken} />
 
       {formError ? (
         <p
