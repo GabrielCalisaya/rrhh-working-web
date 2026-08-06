@@ -212,7 +212,11 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
      * validación, así que subir el CV y crear la postulación —que son dos
      * llamadas— no pueden compartirlo.
      */
-    let token = captchaToken;
+    // `ensure()` devuelve el token si ya llegó, y si no espera a que Cloudflare
+    // lo emita. Antes se leía el estado directamente: quien completaba rápido y
+    // enviaba antes de que el widget resolviera mandaba null y recibía un 400,
+    // sin haber hecho nada mal.
+    let token = (await turnstileRef.current?.ensure()) ?? captchaToken;
 
     if (cvFile) {
       try {

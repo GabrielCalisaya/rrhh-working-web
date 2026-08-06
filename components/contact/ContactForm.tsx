@@ -114,11 +114,15 @@ export function ContactForm() {
       return;
     }
 
+    // Espera a que Turnstile emita el token en vez de enviar null y recibir un
+    // 400 por "falta la verificación", que es lo que pasaba al enviar rápido.
+    const token = (await turnstileRef.current?.ensure()) ?? captchaToken;
+
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...parsed.data, captchaToken }),
+        body: JSON.stringify({ ...parsed.data, captchaToken: token }),
       });
 
       const data = (await response.json()) as { error?: string; message?: string };

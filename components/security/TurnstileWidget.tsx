@@ -28,6 +28,16 @@ const REFRESH_TIMEOUT_MS = 15000;
 
 export type TurnstileHandle = {
   /**
+   * Devuelve el token vigente, o espera al que esté por llegar.
+   *
+   * Turnstile en modo "managed" tarda uno o dos segundos en resolver. Si la
+   * persona completa el formulario rápido y envía antes de eso, el token
+   * todavía no existe y el servidor responde 400 "Completá la verificación
+   * anti-spam" sin que haya hecho nada mal. Con esto el envío espera lo que
+   * falte en vez de fallar.
+   */
+  ensure: () => Promise<string | null>;
+  /**
    * Descarta el token actual y devuelve uno nuevo.
    *
    * Los tokens de Turnstile son DE UN SOLO USO: apenas el servidor los valida
@@ -73,6 +83,9 @@ export const TurnstileWidget = forwardRef<TurnstileHandle, Props>(function Turns
    */
   const pendingRef = useRef<((token: string | null) => void) | null>(null);
 
+  /** Último token emitido por Cloudflare, para poder responder sin esperar. */
+  const tokenRef = useRef<string | null>(null);
+
   const settlePending = (token: string | null) => {
     const resolve = pendingRef.current;
     if (resolve) {
@@ -81,9 +94,27 @@ export const TurnstileWidget = forwardRef<TurnstileHandle, Props>(function Turns
     }
   };
 
+  /** Espera el próximo token que emita el widget, con corte por tiempo. */
+  const waitForToken = () =>
+    new Promise<string | null>((resolve) => {
+      settlePending(null);
+      pendingRef.current = resolve;
+      setTimeout(() => settlePending(null), REFRESH_TIMEOUT_MS);
+    });
+
   useImperativeHandle(
     ref,
     () => ({
+      ensure: () => {
+        if (!siteKey || !widgetIdRef.current) {
+          return Promise.resolve(null);
+        }
+        if (tokenRef.current) {
+          return Promise.resolve(tokenRef.current);
+        }
+        return waitForToken();
+      },
+
       refresh: () => {
         // Sin clave configurada el captcha está desactivado: no hay nada que
         // refrescar y el servidor tampoco va a pedir token.
@@ -91,19 +122,10 @@ export const TurnstileWidget = forwardRef<TurnstileHandle, Props>(function Turns
           return Promise.resolve(null);
         }
 
-        return new Promise<string | null>((resolve) => {
-          // Si un refresh anterior quedó colgado, se lo cierra con null para no
-          // dejar promesas sin resolver.
-          settlePending(null);
-          pendingRef.current = resolve;
-
-          onToken(null);
-          window.turnstile!.reset(widgetIdRef.current!);
-
-          // Red de seguridad: si Cloudflare no responde, el formulario sigue
-          // su curso en vez de quedarse esperando para siempre.
-          setTimeout(() => settlePending(null), REFRESH_TIMEOUT_MS);
-        });
+        tokenRef.current = null;
+        onToken(null);
+        window.turnstile.reset(widgetIdRef.current);
+        return waitForToken();
       },
     }),
     [siteKey, onToken],
@@ -127,15 +149,18 @@ export const TurnstileWidget = forwardRef<TurnstileHandle, Props>(function Turns
         theme: "auto",
         callback: (token) => {
           setFailed(false);
+          tokenRef.current = token;
           onToken(token);
           settlePending(token);
         },
         "expired-callback": () => {
+          tokenRef.current = null;
           onToken(null);
           settlePending(null);
         },
         "error-callback": () => {
           setFailed(true);
+          tokenRef.current = null;
           onToken(null);
           settlePending(null);
         },

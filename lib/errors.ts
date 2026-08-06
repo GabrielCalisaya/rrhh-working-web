@@ -48,7 +48,14 @@ export const appErrors = {
   vacancyNotFound: () => new AppError("vacancy_not_found", 404, "Vacante no encontrada"),
   vacancyClosed: () => new AppError("vacancy_closed", 409, "Esta vacante no acepta postulaciones"),
   duplicateApplication: () =>
-    new AppError("duplicate_application", 409, "La persona ya se postuló a esta vacante"),
+    // Le habla al candidato, que es quien lo lee: "La persona ya se postuló"
+    // estaba redactado desde el punto de vista del panel y sonaba a error del
+    // sistema en vez de a una aclaración.
+    new AppError(
+      "duplicate_application",
+      409,
+      "Ya recibimos una postulación tuya para esta búsqueda. No hace falta que la envíes otra vez.",
+    ),
   invalidCvReference: () =>
     new AppError("invalid_cv_reference", 400, "El CV indicado no existe o no es válido"),
   cvUploadDisabled: () => new AppError("cv_upload_disabled", 403, "La carga de CV no está habilitada"),
