@@ -126,13 +126,13 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
     setCvFile(file);
   }
 
-  async function uploadCv(file: File, token: string | null) {
+  async function uploadCv(file: File) {
+    // Sin captchaToken: esta ruta ya no lo pide (ver app/api/applications/
+    // upload-cv/route.ts). El captcha se valida una sola vez, al crear la
+    // postulación.
     const uploadPayload = new FormData();
     uploadPayload.append("file", file);
     uploadPayload.append("vacancyId", vacancyId);
-    if (token) {
-      uploadPayload.append("captchaToken", token);
-    }
 
     const uploadResponse = await fetch("/api/applications/upload-cv", {
       method: "POST",
@@ -212,24 +212,26 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
      * validación, así que subir el CV y crear la postulación —que son dos
      * llamadas— no pueden compartirlo.
      */
-    // `ensure()` devuelve el token si ya llegó, y si no espera a que Cloudflare
-    // lo emita. Antes se leía el estado directamente: quien completaba rápido y
-    // enviaba antes de que el widget resolviera mandaba null y recibía un 400,
-    // sin haber hecho nada mal.
-    let token = (await turnstileRef.current?.ensure()) ?? captchaToken;
+    /**
+     * UN token para todo el envío.
+     *
+     * El CV se sube primero y sin captcha, así que el token se consume una sola
+     * vez, al crear la postulación. Antes se pedía uno por petición y había que
+     * reiniciar el widget en el medio: esa era la verificación que se veía
+     * reiniciarse sola al tocar "Enviar".
+     *
+     * `ensure()` devuelve el token si ya está, y si no espera a que Cloudflare
+     * lo emita, en lugar de mandar null y recibir un 400.
+     */
+    const token = (await turnstileRef.current?.ensure()) ?? captchaToken;
 
     if (cvFile) {
       try {
-        result.data.cvFilePath = await uploadCv(cvFile, token);
-        // Token nuevo para la petición siguiente.
-        token = await turnstileRef.current?.refresh() ?? null;
+        result.data.cvFilePath = await uploadCv(cvFile);
       } catch (error) {
         setStatus("error");
         setMessage((error as Error).message);
         setIsSubmitting(false);
-        // Sin esto, reintentar mandaría el token ya consumido y fallaría
-        // siempre, dejando el formulario trabado hasta recargar la página.
-        void turnstileRef.current?.refresh();
         return;
       }
     }
