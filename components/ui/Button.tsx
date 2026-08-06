@@ -28,7 +28,7 @@ export function Button({ variant = "primary", className = "", ...props }: Button
    */
   const variantClass =
     variant === "primary"
-      ? "bg-[var(--color-primary-dark)] text-white shadow-[var(--rw-shadow-xs)] hover:bg-[var(--color-primary-strong)] hover:shadow-[var(--rw-shadow-sm)]"
+      ? "bg-[var(--color-btn-primary-bg)] text-[var(--color-btn-primary-fg)] shadow-[var(--rw-shadow-xs)] hover:bg-[var(--color-btn-primary-bg-hover)] hover:shadow-[var(--rw-shadow-sm)]"
       : "border border-[var(--color-primary)] bg-[var(--color-surface)] text-[var(--color-primary-dark)] hover:border-[var(--color-primary-dark)] hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-primary-strong)]";
 
   return <button className={`${baseClass} ${variantClass} ${className}`.trim()} {...props} />;

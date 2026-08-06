@@ -75,7 +75,7 @@ export default async function EmpleosPage({
 
       <div className="grid gap-4">
         {vacancies.length === 0 ? (
-          <p className="rounded-lg border border-[var(--color-accent)] bg-white p-6 text-sm text-[var(--color-primary-dark)]">
+          <p className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-sm text-[var(--color-primary-dark)]">
             No se encontraron búsquedas con esos filtros. Probá quitando alguno.
           </p>
         ) : (

@@ -71,14 +71,14 @@ export function ApplicationsManager({ initialApplications }: ApplicationsManager
       {message ? <p className="text-sm text-[var(--color-primary-dark)]">{message}</p> : null}
       <div className="grid gap-3">
         {applications.map((application) => (
-          <article key={application.id} className="rounded-lg border border-[var(--color-accent)] bg-white p-4 text-sm">
+          <article key={application.id} className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm">
             <p className="font-semibold">{application.vacancyTitle}</p>
             <p>{application.candidateName}</p>
             <p className="text-[var(--color-primary-dark)]">{application.candidateEmail}</p>
             <div className="mt-2 flex items-center gap-2">
               <span className="text-[var(--color-primary-dark)]">Estado:</span>
               <select
-                className="rounded-md border border-[var(--color-accent)] bg-white px-2 py-1 text-sm"
+                className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm"
                 value={application.status}
                 onChange={(event) => updateStatus(application.id, event.target.value as ApplicationStatus)}
               >
@@ -94,7 +94,7 @@ export function ApplicationsManager({ initialApplications }: ApplicationsManager
                   type="button"
                   onClick={() => downloadCv(application.id)}
                   disabled={downloadingId === application.id}
-                  className="rounded-md border border-[var(--color-primary)] px-2 py-1 text-xs font-semibold text-[var(--color-primary-dark)] hover:bg-[var(--color-accent)] disabled:opacity-60"
+                  className="rounded-md border border-[var(--color-primary)] px-2 py-1 text-xs font-semibold text-[var(--color-primary-dark)] hover:bg-[var(--color-accent-soft)] disabled:opacity-60"
                 >
                   {downloadingId === application.id ? "Generando..." : "Ver CV"}
                 </button>

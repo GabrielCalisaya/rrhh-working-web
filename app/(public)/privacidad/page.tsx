@@ -19,7 +19,7 @@ export default function PrivacidadPage() {
         </p>
       </div>
 
-      <div className="space-y-6 rounded-xl border border-[var(--color-accent)] bg-white p-6 text-sm leading-relaxed shadow-sm">
+      <div className="space-y-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-sm leading-relaxed shadow-sm">
         <div>
           <h2 className="text-lg font-semibold">Qué datos guardamos</h2>
           <p className="mt-2">

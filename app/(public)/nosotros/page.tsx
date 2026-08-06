@@ -30,7 +30,7 @@ export default function NosotrosPage() {
   return (
     <div className="space-y-14">
       {/* Quiénes somos */}
-      <section className="space-y-4">
+      <section className="u-reveal space-y-4">
         <p className="text-xs uppercase tracking-[0.22em] text-[var(--color-primary-dark)]">{BRAND.location}</p>
         <h1 className="text-3xl font-semibold md:text-4xl">Quiénes somos</h1>
         <div className="max-w-3xl space-y-4 text-base leading-relaxed text-[var(--color-primary-dark)]">
@@ -41,7 +41,7 @@ export default function NosotrosPage() {
       </section>
 
       {/* Visión y misión */}
-      <section className="space-y-5">
+      <section className="u-reveal space-y-5">
         <h2 className="text-2xl font-semibold">Visión y misión</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="border-l-4 border-l-[var(--color-primary)]">
@@ -63,7 +63,7 @@ export default function NosotrosPage() {
       </section>
 
       {/* Valores */}
-      <section className="space-y-5">
+      <section className="u-reveal space-y-5">
         <div>
           <h2 className="text-2xl font-semibold">Valores empresariales</h2>
           <p className="mt-1 max-w-2xl text-sm text-[var(--color-primary-dark)]">
@@ -87,7 +87,7 @@ export default function NosotrosPage() {
       </section>
 
       {/* Equipo */}
-      <section className="space-y-5">
+      <section className="u-reveal space-y-5">
         <div>
           <h2 className="text-2xl font-semibold">Nuestro equipo</h2>
           <p className="mt-1 max-w-2xl text-sm text-[var(--color-primary-dark)]">
@@ -115,34 +115,27 @@ export default function NosotrosPage() {
         </ul>
       </section>
 
-      {/* Clientes */}
-      <section className="space-y-5">
-        <div>
-          <h2 className="text-2xl font-semibold">Nuestros clientes</h2>
-          <p className="mt-1 max-w-2xl text-sm text-[var(--color-primary-dark)]">
-            Empresas que confiaron en nosotras para sus procesos de búsqueda y selección.
-          </p>
-        </div>
+      {/*
+        SECCIÓN "NUESTROS CLIENTES" — retirada, no perdida.
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {/*
-            Espacio reservado para los logos. El portafolio incluye la sección
-            "Nuestros Clientes" pero sin nombres legibles, así que no se listan
-            empresas: cargar los logos reales reemplazando estos marcadores.
-          */}
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div
-              key={index}
-              className="flex h-24 items-center justify-center rounded-lg border border-dashed border-[var(--color-accent)] bg-white text-xs text-[var(--color-primary-dark)]"
-            >
-              Logo cliente
-            </div>
-          ))}
-        </div>
-      </section>
+        Tenía ocho recuadros punteados con el texto "Logo cliente". En una
+        sección cuyo propósito es generar confianza, ese marcador comunica lo
+        contrario: que el sitio quedó a medio terminar. Y estaba en producción,
+        justo debajo de la presentación del equipo.
+
+        Un espacio vacío no resta; un vacío señalado, sí. Por eso se retira
+        completa en lugar de dejar los marcadores hasta que lleguen los logos.
+
+        Para restituirla cuando estén disponibles:
+          1. Guardar los archivos en /public/clientes/.
+          2. Agregar `export const CLIENTS = [{ name, logo }, ...]` en
+             lib/content/institucional.ts.
+          3. Recuperar esta sección desde el historial de git y recorrer CLIENTS
+             con <Image /> en vez del Array.from de marcadores.
+      */}
 
       {/* CTA */}
-      <section className="rounded-xl border border-[var(--color-accent)] bg-white p-8 text-center shadow-sm">
+      <section className="u-reveal rounded-[var(--rw-radius-xl)] border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-accent-soft)]/60 to-[var(--color-surface)] p-8 text-center shadow-[var(--rw-shadow-sm)] md:p-10">
         <h2 className="text-xl font-semibold">¿Buscás incorporar talento a tu equipo?</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm text-[var(--color-primary-dark)]">
           Contanos qué perfil necesitás y armamos el proceso de búsqueda a medida.

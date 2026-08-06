@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Icon } from "@/components/ui/Icon";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 /**
@@ -19,7 +20,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
  * Esto NO es un control de seguridad: solo decide qué enlace mostrar. El acceso
  * real lo protegen middleware.ts, requireStaffAccess() y las políticas RLS.
  */
-export function StaffNav() {
+export function StaffNav({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
   const [isStaff, setIsStaff] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -50,10 +51,17 @@ export function StaffNav() {
     return null;
   }
 
+  const isMobile = variant === "mobile";
+
   if (!isStaff) {
     return (
       <li>
-        <Link href="/auth/login" className="underline hover:text-[var(--color-primary)]">
+        <Link
+          href="/auth/login"
+          className={`inline-flex items-center text-[var(--color-primary-dark)] underline-offset-4 transition-colors hover:text-[var(--color-primary-strong)] hover:underline ${
+            isMobile ? "min-h-11" : "min-h-9 px-2"
+          }`}
+        >
           Acceso staff
         </Link>
       </li>
@@ -62,17 +70,47 @@ export function StaffNav() {
 
   return (
     <>
+      {/* Separador. El bloque de staff no es navegación del sitio: es otra
+          categoría de acción. Un divisor de 1px lo comunica sin necesidad de
+          gritar con color o peso tipográfico. Sólo en desktop, donde los ítems
+          van en línea; en el menú mobile ya hay un borde que cumple ese rol. */}
+      {!isMobile ? (
+        <li aria-hidden="true" className="mx-2 h-5 w-px shrink-0 bg-[var(--color-border-strong)]" />
+      ) : null}
+
       <li>
         <Link
           href="/admin"
-          className="inline-flex min-h-11 items-center rounded-[var(--rw-radius-md)] bg-[var(--color-primary-dark)] px-4 py-2 font-medium text-white transition-colors duration-[var(--rw-duration-fast)] hover:bg-[var(--color-primary-strong)] md:min-h-9"
+          /**
+           * El botón antes era un bloque sólido de color pegado al final de la
+           * navegación: más alto que los links de al lado y con mucho más peso
+           * visual del que le corresponde a un acceso interno del staff, que la
+           * mayoría de las visitas ni siquiera ve.
+           *
+           * Ahora arranca como una pastilla tenue de la misma altura que el
+           * resto de los ítems y sólo se vuelve sólido al hacer hover. Pertenece
+           * a la barra en vez de estar apoyado encima.
+           *
+           * `whitespace-nowrap` garantiza que "Panel" nunca se parta en dos
+           * líneas ni se recorte cuando la barra se comprime en tablet.
+           */
+          className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-[var(--rw-radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-accent-soft)] px-3 font-medium text-[var(--color-primary-strong)] transition-[background-color,color,border-color,box-shadow] duration-[var(--rw-duration-fast)] hover:border-[var(--color-primary-dark)] hover:bg-[var(--color-btn-primary-bg)] hover:text-[var(--color-btn-primary-fg)] hover:shadow-[var(--rw-shadow-xs)] ${
+            isMobile ? "min-h-11 py-2" : "min-h-9 py-1.5"
+          }`}
         >
+          <Icon name="chart" className="h-4 w-4 shrink-0" />
           Panel
         </Link>
       </li>
+
       <li>
         <form action="/auth/logout" method="post">
-          <button type="submit" className="underline hover:text-[var(--color-primary)]">
+          <button
+            type="submit"
+            className={`inline-flex items-center text-[var(--color-primary-dark)] underline-offset-4 transition-colors hover:text-[var(--color-primary-strong)] hover:underline ${
+              isMobile ? "min-h-11" : "min-h-9 px-2"
+            }`}
+          >
             Salir
           </button>
         </form>

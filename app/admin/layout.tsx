@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
-      <aside className="h-fit rounded-xl border border-[var(--color-accent)] bg-white p-4 shadow-sm lg:sticky lg:top-28">
+      <aside className="h-fit rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm lg:sticky lg:top-28">
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-primary-dark)]">Panel admin</p>
         <p className="mt-1 text-sm font-semibold">{session?.fullName ?? "Staff"}</p>
         <p className="text-xs capitalize text-[var(--color-primary-dark)]">{session?.role ?? "sin rol"}</p>

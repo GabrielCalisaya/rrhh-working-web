@@ -48,7 +48,7 @@ export function Pagination({ basePath, page, total, pageSize = PAGE_SIZE }: Prop
             Anterior
           </Link>
         ) : (
-          <span className="rounded-md border border-[var(--color-accent)] px-3 py-1.5 text-sm text-[var(--color-accent)]">
+          <span className="inline-flex min-h-11 items-center rounded-[var(--rw-radius-md)] border border-[var(--color-border)] px-4 py-2 text-sm md:min-h-10 text-[var(--color-text-muted)] opacity-60">
             Anterior
           </span>
         )}
@@ -66,7 +66,7 @@ export function Pagination({ basePath, page, total, pageSize = PAGE_SIZE }: Prop
             Siguiente
           </Link>
         ) : (
-          <span className="rounded-md border border-[var(--color-accent)] px-3 py-1.5 text-sm text-[var(--color-accent)]">
+          <span className="inline-flex min-h-11 items-center rounded-[var(--rw-radius-md)] border border-[var(--color-border)] px-4 py-2 text-sm md:min-h-10 text-[var(--color-text-muted)] opacity-60">
             Siguiente
           </span>
         )}

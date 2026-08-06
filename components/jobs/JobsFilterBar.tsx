@@ -105,7 +105,7 @@ export function JobsFilterBar({ filters, facets, resultCount }: Props) {
       <div className="flex flex-wrap items-center gap-4">
         <button
           type="submit"
-          className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary-dark)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-strong)]"
+          className="inline-flex items-center justify-center min-h-11 rounded-[var(--rw-radius-md)] bg-[var(--color-btn-primary-bg)] px-5 py-2.5 text-sm font-semibold text-[var(--color-btn-primary-fg)] shadow-[var(--rw-shadow-xs)] transition-[background-color,box-shadow] duration-[var(--rw-duration-fast)] hover:bg-[var(--color-btn-primary-bg-hover)] hover:shadow-[var(--rw-shadow-sm)] md:min-h-10"
         >
           Filtrar
         </button>

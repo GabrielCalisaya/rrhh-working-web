@@ -100,7 +100,7 @@ export function TurnstileWidget({ onToken }: Props) {
     <div>
       <div ref={containerRef} />
       {failed ? (
-        <p className="mt-1 text-xs text-red-700" role="alert">
+        <p className="mt-1 text-xs text-[var(--color-danger-text)]" role="alert">
           No se pudo cargar la verificación anti-spam. Revisá tu conexión y recargá la página.
         </p>
       ) : null}

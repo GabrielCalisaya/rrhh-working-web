@@ -115,9 +115,9 @@ export function ApplyForm({ vacancyId, vacancyTitle }: ApplyFormProps) {
 
   if (status === "success") {
     return (
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center shadow-sm">
-        <p className="text-lg font-semibold text-emerald-900">¡Postulación enviada!</p>
-        <p className="mt-2 text-sm text-emerald-800">
+      <div className="rounded-xl border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-6 text-center shadow-sm">
+        <p className="text-lg font-semibold text-[var(--color-success-text)]">¡Postulación enviada!</p>
+        <p className="mt-2 text-sm text-[var(--color-success-text)]">
           Recibimos tu postulación para <strong>{vacancyTitle}</strong>. Te contactaremos si avanzás en el proceso.
         </p>
       </div>
@@ -127,7 +127,7 @@ export function ApplyForm({ vacancyId, vacancyTitle }: ApplyFormProps) {
   return (
     <form
       action={handleSubmit}
-      className="grid gap-5 rounded-xl border border-[var(--color-accent)] bg-white p-6 shadow-sm"
+      className="grid gap-5 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm"
       aria-label="Formulario de postulación"
     >
       <div className="grid gap-4 md:grid-cols-2">
@@ -203,7 +203,7 @@ export function ApplyForm({ vacancyId, vacancyTitle }: ApplyFormProps) {
         <p className="mt-1 text-xs text-[var(--color-primary-dark)]">Máximo 5 MB. Solo archivos PDF.</p>
       </div>
 
-      <label className="flex items-start gap-3 rounded-md border border-[var(--color-accent)] bg-[var(--color-background)] p-3 text-sm">
+      <label className="flex items-start gap-3 rounded-md border border-[var(--color-border)] bg-[var(--color-background)] p-3 text-sm">
         <input name="consent" type="checkbox" required className="mt-1" />
         <span>
           Acepto el tratamiento de mis datos personales para procesos de selección de RRHH Working. Conservamos tus
@@ -218,7 +218,7 @@ export function ApplyForm({ vacancyId, vacancyTitle }: ApplyFormProps) {
       <TurnstileWidget onToken={handleCaptchaToken} />
 
       {status === "error" && message ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+        <p className="rounded-md border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] px-3 py-2 text-sm text-[var(--color-danger-text)]" role="alert">
           {message}
         </p>
       ) : null}

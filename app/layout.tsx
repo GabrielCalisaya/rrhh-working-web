@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BRAND } from "@/lib/content/institucional";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 /**
  * Inter, la tipografía que `globals.css` ya asumía pero que nunca se cargaba.
@@ -59,11 +60,17 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es-AR" className={`${inter.variable} h-full antialiased`}>
+    // suppressHydrationWarning: el script de abajo escribe `data-theme` en <html>
+    // antes de que React hidrate, así que el atributo del cliente no coincide
+    // con el del servidor. Es intencional y está acotado a este elemento.
+    <html lang="es-AR" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full bg-[var(--color-background)] text-[var(--color-text)]">
         <a
           href="#contenido"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:shadow"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-[var(--color-surface)] focus:px-4 focus:py-2 focus:shadow"
         >
           Saltar al contenido
         </a>

@@ -197,7 +197,7 @@ export default async function PostularPage({ params }: { params: Promise<{ vacan
               abajo. Este ancla evita tener que scrollear a ciegas buscándolo. */}
           <a
             href="#postular"
-            className="mt-6 inline-flex min-h-11 items-center justify-center rounded-[var(--rw-radius-md)] bg-[var(--color-primary-dark)] px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--rw-shadow-xs)] transition-[background-color,box-shadow] duration-[var(--rw-duration-fast)] hover:bg-[var(--color-primary-strong)] hover:shadow-[var(--rw-shadow-sm)] md:hidden"
+            className="mt-6 inline-flex min-h-11 items-center justify-center rounded-[var(--rw-radius-md)] bg-[var(--color-btn-primary-bg)] px-5 py-2.5 text-sm font-semibold text-[var(--color-btn-primary-fg)] shadow-[var(--rw-shadow-xs)] transition-[background-color,box-shadow] duration-[var(--rw-duration-fast)] hover:bg-[var(--color-btn-primary-bg-hover)] hover:shadow-[var(--rw-shadow-sm)] md:hidden"
           >
             Ir al formulario
           </a>

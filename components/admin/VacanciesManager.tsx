@@ -92,13 +92,13 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-lg border border-[var(--color-accent)] bg-white p-4">
+      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
         <h2 className="text-lg font-semibold">Nueva vacante</h2>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <Input placeholder="Título" value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} />
           <Input placeholder="Ciudad" value={form.city} onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))} />
           <select
-            className="rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+            className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
             value={form.modality}
             onChange={(event) => setForm((current) => ({ ...current, modality: event.target.value as Vacancy["modality"] }))}
           >
@@ -107,7 +107,7 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
             <option value="Remoto">Remoto</option>
           </select>
           <select
-            className="rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+            className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
             value={form.employment_type}
             onChange={(event) => setForm((current) => ({ ...current, employment_type: event.target.value as Vacancy["employment_type"] }))}
           >
@@ -117,7 +117,7 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
             <option value="Pasantía">Pasantía</option>
           </select>
           <select
-            className="rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+            className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
             value={form.seniority}
             onChange={(event) => setForm((current) => ({ ...current, seniority: event.target.value as Vacancy["seniority"] }))}
           >
@@ -127,7 +127,7 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
             <option value="Lead">Lead</option>
           </select>
           <select
-            className="rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+            className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
             value={form.status}
             onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as VacancyStatus }))}
           >
@@ -137,7 +137,7 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
           </select>
         </div>
         <textarea
-          className="mt-3 min-h-24 w-full rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+          className="mt-3 min-h-24 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
           placeholder="Descripción (mínimo 20 caracteres)"
           value={form.description}
           onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
@@ -152,10 +152,10 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-[var(--color-accent)] bg-white">
+      <div className="overflow-x-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
         <table className="min-w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-[var(--color-accent)]">
+            <tr className="border-b border-[var(--color-border)]">
               <th className="px-4 py-3">Título</th>
               <th className="px-4 py-3">Ciudad</th>
               <th className="px-4 py-3">Estado</th>
@@ -164,13 +164,13 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
           </thead>
           <tbody>
             {orderedVacancies.map((vacancy) => (
-              <tr key={vacancy.id} className="border-b border-[var(--color-accent)] last:border-0">
+              <tr key={vacancy.id} className="border-b border-[var(--color-border)] last:border-0">
                 <td className="px-4 py-3">{vacancy.title}</td>
                 <td className="px-4 py-3">{vacancy.city}</td>
                 <td className="px-4 py-3">{vacancy.status}</td>
                 <td className="px-4 py-3">
                   <select
-                    className="rounded-md border border-[var(--color-accent)] bg-white px-2 py-1 text-sm"
+                    className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm"
                     value={vacancy.status}
                     onChange={(event) => updateStatus(vacancy.id, event.target.value as VacancyStatus)}
                   >

@@ -70,16 +70,16 @@ export function DeletionRequestsManager({ initialRequests }: { initialRequests: 
 
       <div className="grid gap-3">
         {requests.map((item) => (
-          <article key={item.id} className="rounded-lg border border-[var(--color-accent)] bg-white p-4 text-sm">
+          <article key={item.id} className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-semibold">{item.email}</p>
               <span
                 className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
                   item.status === "pending"
-                    ? "bg-amber-100 text-amber-900"
+                    ? "bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]"
                     : item.status === "completed"
-                      ? "bg-emerald-100 text-emerald-900"
-                      : "bg-neutral-200 text-neutral-700"
+                      ? "bg-[var(--color-success-bg)] text-[var(--color-success-text)]"
+                      : "bg-[var(--color-neutral-bg)] text-[var(--color-neutral-text)]"
                 }`}
               >
                 {STATUS_LABEL[item.status]}
@@ -98,7 +98,7 @@ export function DeletionRequestsManager({ initialRequests }: { initialRequests: 
                   type="button"
                   onClick={() => resolve(item.id, "complete", item.email)}
                   disabled={busyId === item.id}
-                  className="rounded-md bg-red-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-800 disabled:opacity-60"
+                  className="inline-flex min-h-9 items-center rounded-[var(--rw-radius-md)] bg-[var(--color-danger-solid-bg)] px-3 py-1.5 text-xs font-semibold text-[var(--color-danger-solid-fg)] transition-colors duration-[var(--rw-duration-fast)] hover:bg-[var(--color-danger-solid-bg-hover)] disabled:opacity-60"
                 >
                   {busyId === item.id ? "Eliminando..." : "Eliminar datos"}
                 </button>
@@ -106,7 +106,7 @@ export function DeletionRequestsManager({ initialRequests }: { initialRequests: 
                   type="button"
                   onClick={() => resolve(item.id, "reject", item.email)}
                   disabled={busyId === item.id}
-                  className="rounded-md border border-[var(--color-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--color-primary-dark)] hover:bg-[var(--color-accent)] disabled:opacity-60"
+                  className="rounded-md border border-[var(--color-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--color-primary-dark)] hover:bg-[var(--color-accent-soft)] disabled:opacity-60"
                 >
                   Rechazar
                 </button>

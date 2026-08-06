@@ -18,10 +18,19 @@ export const BRAND = {
   location: "San Salvador de Jujuy, Argentina",
 } as const;
 
+/**
+ * Datos de contacto. Punto único de cambio: los usan la página de contacto, el
+ * pie, la metadata y el aviso de privacidad.
+ *
+ * `phone` es lo que se muestra; `phoneHref` es lo que se marca. Van separados a
+ * propósito: el formato legible (espacios, guiones) rompe el enlace `tel:` en
+ * algunos teléfonos, y el formato internacional (+54...) se lee mal en pantalla.
+ * Al cambiar el número hay que actualizar los dos.
+ */
 export const CONTACT = {
   email: "rrhhworking17@gmail.com",
-  phone: "388-4079618",
-  phoneHref: "tel:+543884079618",
+  phone: "388 329 5992",
+  phoneHref: "tel:+543883295992",
 } as const;
 
 // ---------------------------------------------------------------------------

@@ -67,6 +67,44 @@
   --color-text-muted: #4b5563; /*  7.6:1 — texto secundario           */
 
   /* -------------------------------------------------------------------------
+     Botón primario
+     ---------------------------------------------------------------------------
+     Tiene tokens propios en vez de reusar los de marca porque en modo oscuro la
+     relación se invierte: el fondo pasa a ser el tono medio y el texto, oscuro.
+     Con `text-white` fijo en el componente, el botón quedaba ilegible en dark.
+     ------------------------------------------------------------------------- */
+  --color-btn-primary-bg: #5a7579;
+  --color-btn-primary-bg-hover: #4c6669;
+  --color-btn-primary-fg: #ffffff;
+
+  /* -------------------------------------------------------------------------
+     Estados semánticos
+     ---------------------------------------------------------------------------
+     Antes cada formulario escribía `bg-emerald-50 border-emerald-200
+     text-emerald-900` a mano. Además de repetirse, esos verdes y rojos de
+     Tailwind están calculados para fondos claros: en modo oscuro quedaban como
+     manchas fluorescentes. Como tokens, cada tema define su propia versión.
+     ------------------------------------------------------------------------- */
+  --color-success-bg: #ecfdf5;
+  --color-success-border: #a7f3d0;
+  --color-success-text: #065f46;
+
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-text: #b91c1c;
+
+  /* Acción destructiva sólida (eliminar datos de un candidato). */
+  --color-danger-solid-bg: #b91c1c;
+  --color-danger-solid-bg-hover: #991b1b;
+  --color-danger-solid-fg: #ffffff;
+
+  /* Badges de estado del panel. */
+  --color-warning-bg: #fef3c7;
+  --color-warning-text: #78350f;
+  --color-neutral-bg: #e7e5e4;
+  --color-neutral-text: #44403c;
+
+  /* -------------------------------------------------------------------------
      Elevación
      ---------------------------------------------------------------------------
      Sombras tintadas con el matiz de la marca en lugar de negro puro: sobre un
@@ -115,6 +153,85 @@
 
   /* Altura aproximada del header sticky. La usa `scroll-padding-top`. */
   --rw-header-offset: 6.5rem;
+
+  /* Le avisa al navegador que pinte sus controles nativos (scrollbar, menús de
+     los select, autocompletado) en su versión clara. */
+  color-scheme: light;
+}
+
+/* ===========================================================================
+   MODO OSCURO
+   ---------------------------------------------------------------------------
+   Se activa con `data-theme="dark"` en <html>, no con `prefers-color-scheme`.
+   La preferencia explícita del usuario tiene que poder ganarle a la del
+   sistema: alguien con el celular en oscuro puede querer este sitio en claro.
+   El sistema se usa sólo como valor inicial, en el script del layout.
+
+   Un aviso sobre los nombres: los tokens son semánticos por ROL, no por valor.
+   `--color-primary-dark` significa "el color de marca que se lee sobre el
+   fondo", y en modo oscuro eso es un tono CLARO. Suena contradictorio leído
+   fuera de contexto, pero es lo que permite que todo el sitio cambie de tema
+   sin tocar una sola clase en los componentes.
+
+   La paleta es desaturada a propósito. Los grises tienen una pizca del matiz
+   verde de la marca en lugar de ser neutros puros: mantiene la identidad y
+   evita el gris "de sistema operativo". Y el texto es #e6ecec, no blanco puro:
+   el blanco sobre fondo muy oscuro produce halo y cansa la vista.
+   =========================================================================== */
+
+[data-theme="dark"] {
+  --color-primary: #7fa3a7;        /* 6.06:1 sobre surface — decorativo */
+  --color-primary-dark: #9dbdc0;   /* 8.25:1 — texto de marca           */
+  --color-primary-strong: #bcd6d8; /* 8.90:1 — énfasis                  */
+
+  --color-accent: #2f3d40;
+  --color-accent-soft: #243033;
+
+  --color-background: #10171a;
+  --color-surface: #182023;
+  --color-surface-subtle: #141b1e;
+  --color-border: #2a3538;
+  --color-border-strong: #3b4a4e;
+
+  --color-text: #e6ecec;       /* 13.84:1 sobre surface */
+  --color-text-muted: #a3b1b3; /*  7.48:1               */
+
+  /* Acá se invierte la relación: fondo medio, texto oscuro. Con texto blanco
+     sobre un verde claro el contraste caía por debajo de 2:1. */
+  --color-btn-primary-bg: #5f8286;
+  --color-btn-primary-bg-hover: #74999d;
+  --color-btn-primary-fg: #0c1214;
+
+  --color-success-bg: #142a20;
+  --color-success-border: #2c4c3b;
+  --color-success-text: #7fd1a8;
+
+  --color-danger-bg: #2c1618;
+  --color-danger-border: #54282a;
+  --color-danger-text: #ff9b95;
+
+  /* El rojo saturado de modo claro vibra sobre fondo oscuro. Se baja el tono
+     del fondo y se aclara el texto, manteniendo la señal de peligro. */
+  --color-danger-solid-bg: #8f2f27;
+  --color-danger-solid-bg-hover: #a83a31;
+  --color-danger-solid-fg: #ffe4e0;
+
+  --color-warning-bg: #3a2c12;
+  --color-warning-text: #f2c98a;
+  --color-neutral-bg: #262e30;
+  --color-neutral-text: #bcc6c8;
+
+  /* Las sombras de modo claro son invisibles sobre fondo oscuro: ahí la
+     profundidad la da el contraste entre superficies, no la sombra. Se
+     mantienen suaves y más opacas sólo para dar asiento a los elementos
+     flotantes. */
+  --rw-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --rw-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.24);
+  --rw-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.34);
+  --rw-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.3), 0 16px 36px rgba(0, 0, 0, 0.4);
+  --rw-shadow-ring: 0 0 0 1px rgba(127, 163, 167, 0.22);
+
+  color-scheme: dark;
 }
 
 * {
@@ -127,8 +244,26 @@ html {
   scroll-padding-top: var(--rw-header-offset);
 }
 
+/**
+ * Fondo del sitio.
+ *
+ * Dos halos radiales muy tenues del color de marca, fijos respecto del
+ * viewport. Es lo que separa un fondo "vacío" de uno "tratado": el ojo percibe
+ * una variación de luz apenas por debajo del umbral consciente, y el conjunto
+ * deja de leerse como una hoja en blanco.
+ *
+ * `fixed` hace que el fondo no se desplace con el scroll, así que el gradiente
+ * nunca se corta ni se repite por más larga que sea la página. Y al ir en el
+ * body en lugar de un elemento aparte, no agrega nodos ni capas de composición:
+ * el costo de rendimiento es nulo.
+ */
 body {
   margin: 0;
+  background-image:
+    radial-gradient(60rem 40rem at 15% -10%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 60%),
+    radial-gradient(50rem 35rem at 100% 0%, color-mix(in srgb, var(--color-accent) 22%, transparent), transparent 55%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   /* `--font-inter` la inyecta next/font desde el layout raíz. El fallback queda
      por si la fuente no llegara a cargar. */
   font-family: var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -183,6 +318,31 @@ li {
   outline: 2px solid var(--color-primary-strong);
   outline-offset: 2px;
   border-radius: var(--rw-radius-sm);
+}
+
+/* ===========================================================================
+   ÍCONO DEL SELECTOR DE TEMA
+   ---------------------------------------------------------------------------
+   Se resuelve por CSS y no en React a propósito. El servidor no sabe qué tema
+   eligió el usuario, así que un render condicional mostraría el ícono
+   equivocado hasta que hidrate y además provocaría un aviso de desajuste de
+   hidratación. Con estas dos reglas el HTML es el mismo para ambos temas y el
+   ícono correcto se ve desde el primer pintado.
+
+   En claro se muestra la luna (la acción disponible es ir a oscuro), y en
+   oscuro el sol.
+   =========================================================================== */
+
+.rw-icon-sun {
+  display: none;
+}
+
+[data-theme="dark"] .rw-icon-sun {
+  display: block;
+}
+
+[data-theme="dark"] .rw-icon-moon {
+  display: none;
 }
 
 /* ===========================================================================

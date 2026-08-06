@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { StaffNav } from "@/components/layout/StaffNav";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { BRAND } from "@/lib/content/institucional";
 
 const NAV_ITEMS = [
@@ -143,8 +144,13 @@ export function Header() {
             </span>
           </Link>
 
-          {/* --- Navegación desktop --- */}
-          <nav aria-label="Principal" className="hidden md:block">
+          {/* El selector de tema queda fuera del <nav>: no es navegación, es un
+              control de la interfaz. Está siempre visible, también en mobile,
+              porque esconderlo dentro del menú desplegable obligaría a abrirlo
+              para algo que se usa de un toque. */}
+          <div className="flex items-center gap-1">
+            {/* --- Navegación desktop --- */}
+            <nav aria-label="Principal" className="hidden md:block">
             <ul className="flex flex-wrap items-center gap-1 text-sm font-medium text-[var(--color-primary-dark)]">
               {NAV_ITEMS.map((item) => (
                 <li key={item.href}>
@@ -171,8 +177,10 @@ export function Header() {
             </ul>
           </nav>
 
-          {/* --- Botón del menú mobile --- */}
-          <button
+            <ThemeToggle />
+
+            {/* --- Botón del menú mobile --- */}
+            <button
             ref={toggleRef}
             type="button"
             onClick={() => setIsOpen((open) => !open)}
@@ -199,8 +207,9 @@ export function Header() {
                   isOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0"
                 }`}
               />
-            </span>
-          </button>
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* --- Panel mobile ---
@@ -241,7 +250,7 @@ export function Header() {
                 ))}
                 <li className="mt-2 border-t border-[var(--color-border)] pt-3">
                   <ul className="flex flex-wrap items-center gap-4 px-3 text-sm">
-                    <StaffNav />
+                    <StaffNav variant="mobile" />
                   </ul>
                 </li>
               </ul>

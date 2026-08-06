@@ -42,15 +42,15 @@ export function DeletionRequestForm() {
 
   if (done) {
     return (
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6" role="status">
-        <p className="font-semibold text-emerald-900">Solicitud recibida</p>
-        <p className="mt-2 text-sm text-emerald-800">{message}</p>
+      <div className="rounded-xl border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-6" role="status">
+        <p className="font-semibold text-[var(--color-success-text)]">Solicitud recibida</p>
+        <p className="mt-2 text-sm text-[var(--color-success-text)]">{message}</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 rounded-xl border border-[var(--color-accent)] bg-white p-6 shadow-sm">
+    <form onSubmit={handleSubmit} className="grid gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
       <div>
         <label htmlFor="deletion-email" className="mb-1 block text-sm font-medium">
           Email con el que te postulaste *
@@ -74,14 +74,14 @@ export function DeletionRequestForm() {
           value={reason}
           onChange={(event) => setReason(event.target.value)}
           maxLength={500}
-          className="min-h-24 w-full rounded-md border border-[var(--color-accent)] bg-white px-3 py-2 text-sm"
+          className="min-h-24 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
         />
       </div>
 
       <TurnstileWidget onToken={handleCaptchaToken} />
 
       {message ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+        <p className="rounded-md border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] px-3 py-2 text-sm text-[var(--color-danger-text)]" role="alert">
           {message}
         </p>
       ) : null}

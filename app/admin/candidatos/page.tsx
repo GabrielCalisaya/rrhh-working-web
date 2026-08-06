@@ -34,7 +34,7 @@ export default async function AdminCandidatosPage({
       ) : (
         <div className="grid gap-3">
           {rows.map((candidate) => (
-            <article key={candidate.id} className="rounded-lg border border-[var(--color-accent)] bg-white p-4">
+            <article key={candidate.id} className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
               <h2 className="font-semibold">{candidate.full_name}</h2>
               <p className="text-sm text-[var(--color-primary-dark)]">{candidate.email}</p>
               <p className="text-sm text-[var(--color-primary-dark)]">{candidate.city ?? "Sin ciudad"}</p>

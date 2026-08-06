@@ -28,7 +28,7 @@ export default function ServiciosPage() {
   return (
     <div className="space-y-14">
       {/* Servicios */}
-      <section className="space-y-6">
+      <section className="u-reveal space-y-6">
         <div>
           <h1 className="text-3xl font-semibold md:text-4xl">Servicios</h1>
           <p className="mt-3 max-w-3xl text-base leading-relaxed text-[var(--color-primary-dark)]">
@@ -56,7 +56,7 @@ export default function ServiciosPage() {
       </section>
 
       {/* Proceso de selección */}
-      <section className="space-y-6">
+      <section className="u-reveal space-y-6">
         <div>
           <h2 className="text-2xl font-semibold md:text-3xl">Proceso de búsqueda y selección</h2>
           <p className="mt-3 max-w-3xl text-base leading-relaxed text-[var(--color-primary-dark)]">
@@ -77,17 +77,17 @@ export default function ServiciosPage() {
                 <p className="text-sm text-[var(--color-primary-dark)]">{STAGE_INTRO[stage]}</p>
               </div>
 
-              <ol className="relative space-y-4 border-l-2 border-[var(--color-accent)] pl-6 md:pl-8">
+              <ol className="relative space-y-4 border-l-2 border-[var(--color-border)] pl-6 md:pl-8">
                 {steps.map((step, index) => (
                   <li key={step.title} className="relative">
                     {/* Marcador del timeline, centrado sobre la línea */}
                     <span
-                      className="absolute -left-[2.15rem] flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-dark)] text-xs font-semibold text-white md:-left-[2.65rem]"
+                      className="absolute -left-[2.15rem] flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-btn-primary-bg)] text-xs font-semibold text-[var(--color-btn-primary-fg)] md:-left-[2.65rem]"
                       aria-hidden="true"
                     >
                       {offset + index + 1}
                     </span>
-                    <div className="rounded-lg border border-[var(--color-accent)] bg-white p-4">
+                    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
                       <h4 className="font-semibold">
                         <span className="sr-only">Paso {offset + index + 1}: </span>
                         {step.title}
@@ -105,7 +105,7 @@ export default function ServiciosPage() {
       </section>
 
       {/* CTA */}
-      <section className="rounded-xl border border-[var(--color-accent)] bg-white p-8 text-center shadow-sm">
+      <section className="u-reveal rounded-[var(--rw-radius-xl)] border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-accent-soft)]/60 to-[var(--color-surface)] p-8 text-center shadow-[var(--rw-shadow-sm)] md:p-10">
         <h2 className="text-xl font-semibold">¿Necesitás cubrir una posición?</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm text-[var(--color-primary-dark)]">
           Escribinos y coordinamos una reunión para relevar el perfil que estás buscando.
