@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { vacancyStatusLabel } from "@/lib/content/status-labels";
 import { employmentTypeLabel, seniorityLabel } from "@/lib/content/vacancy-labels";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -134,9 +135,9 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
             value={form.status}
             onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as VacancyStatus }))}
           >
-            <option value="draft">draft</option>
-            <option value="open">open</option>
-            <option value="closed">closed</option>
+            <option value="draft">{vacancyStatusLabel("draft")}</option>
+            <option value="open">{vacancyStatusLabel("open")}</option>
+            <option value="closed">{vacancyStatusLabel("closed")}</option>
           </select>
         </div>
         <textarea
@@ -170,16 +171,16 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
               <tr key={vacancy.id} className="border-b border-[var(--color-border)] last:border-0">
                 <td className="px-4 py-3">{vacancy.title}</td>
                 <td className="px-4 py-3">{vacancy.city}</td>
-                <td className="px-4 py-3">{vacancy.status}</td>
+                <td className="px-4 py-3">{vacancyStatusLabel(vacancy.status)}</td>
                 <td className="px-4 py-3">
                   <select
                     className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm"
                     value={vacancy.status}
                     onChange={(event) => updateStatus(vacancy.id, event.target.value as VacancyStatus)}
                   >
-                    <option value="draft">draft</option>
-                    <option value="open">open</option>
-                    <option value="closed">closed</option>
+                    <option value="draft">{vacancyStatusLabel("draft")}</option>
+                    <option value="open">{vacancyStatusLabel("open")}</option>
+                    <option value="closed">{vacancyStatusLabel("closed")}</option>
                   </select>
                 </td>
               </tr>

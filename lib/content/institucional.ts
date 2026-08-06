@@ -237,12 +237,22 @@ export type TeamMember = {
   name: string;
   role: string;
   bio: string;
+  /**
+   * Ruta de la foto en /public/equipo/. Es OPCIONAL a propósito: mientras
+   * falte alguna, esa integrante muestra sus iniciales y la grilla no se rompe.
+   *
+   * Las fotos están recortadas en cuadrado (640x640) y con el rostro al mismo
+   * tamaño dentro del encuadre, para que la fila se vea pareja. Si se agrega
+   * una nueva, conviene respetar ese criterio.
+   */
+  photo?: string;
 };
 
 export const TEAM: readonly TeamMember[] = [
   {
     name: "Carolina Lobo",
     role: "Fundadora",
+    photo: "/equipo/carolina-lobo.jpg",
     bio: "Licenciada en Recursos Humanos por la Universidad Católica de Salta. Cuenta con experiencia en el reclutamiento y selección de perfiles junior y senior, tanto en empresas como en instituciones educativas, además de formación especializada en selección de perfiles IT. Lidera los procesos de búsqueda y selección de talento.",
   },
   {
@@ -253,6 +263,7 @@ export const TEAM: readonly TeamMember[] = [
   {
     name: "Tania Cari",
     role: "Licenciada en Recursos Humanos",
+    photo: "/equipo/tania-cari.jpg",
     bio: "Licenciada en Recursos Humanos por la Universidad Católica de Salta y diplomada en Derecho Laboral. Se especializa en la optimización de perfiles laborales y en el reclutamiento y selección por sector y función, contribuyendo a maximizar las oportunidades de incorporación de nuevos talentos. Además, lidera su propio emprendimiento personal.",
   },
 ];

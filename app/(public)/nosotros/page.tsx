@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   },
 };
 
-/** Iniciales para el avatar. El portafolio no incluye fotos del equipo. */
+/** Iniciales, para las integrantes que todavía no tienen foto cargada. */
 function initials(name: string): string {
   return name
     .split(" ")
@@ -100,12 +101,33 @@ export default function NosotrosPage() {
           {TEAM.map((member) => (
             <li key={member.name}>
               <Card className="h-full">
-                <div
-                  className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent)] text-lg font-semibold text-[var(--color-primary-dark)]"
-                  aria-hidden="true"
-                >
-                  {initials(member.name)}
-                </div>
+                {/* Foto si la hay, iniciales si todavía no.
+                    El anillo del mismo color en los dos casos hace que la fila
+                    se lea pareja aunque falte alguna foto: sin eso, un avatar
+                    de iniciales al lado de dos retratos se ve como un hueco. */}
+                {member.photo ? (
+                  <Image
+                    src={member.photo}
+                    // alt vacío + aria-hidden: el nombre está en el <h3> justo
+                    // debajo. Repetirlo acá sería ruido para un lector de
+                    // pantalla, porque la foto no aporta información propia.
+                    alt=""
+                    aria-hidden="true"
+                    width={160}
+                    height={160}
+                    // sizes: el avatar se muestra a 80px, así que el navegador
+                    // no necesita descargar los 640px del archivo original.
+                    sizes="80px"
+                    className="h-20 w-20 rounded-full object-cover shadow-[var(--rw-shadow-ring)] ring-2 ring-[var(--color-accent-soft)]"
+                  />
+                ) : (
+                  <div
+                    className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-xl font-semibold text-[var(--color-primary-strong)] ring-2 ring-[var(--color-accent-soft)]"
+                    aria-hidden="true"
+                  >
+                    {initials(member.name)}
+                  </div>
+                )}
                 <h3 className="mt-4 text-lg font-semibold">{member.name}</h3>
                 <p className="text-sm font-medium text-[var(--color-primary)]">{member.role}</p>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--color-primary-dark)]">{member.bio}</p>

@@ -146,6 +146,24 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
     return uploadResult.data.path;
   }
 
+  /**
+   * El envío se maneja con `onSubmit` y no con `action={...}`.
+   *
+   * Con `<form action={fn}>`, React 19 RESETEA el formulario en cuanto la
+   * función termina, sin importar si el envío salió bien o mal. El efecto era
+   * que un error de validación —un correo mal escrito, el consentimiento sin
+   * tildar— borraba todo lo cargado y obligaba a empezar de cero. En un
+   * formulario de postulación, eso es directamente perder al candidato.
+   *
+   * Con `onSubmit` + preventDefault el reset no ocurre y los datos quedan donde
+   * estaban. El estado de éxito ya reemplaza el formulario entero, así que no
+   * se pierde nada por no resetearlo.
+   */
+  function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void handleSubmit(new FormData(event.currentTarget));
+  }
+
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
     setStatus("idle");
@@ -246,7 +264,7 @@ export function ApplyForm({ vacancyId, vacancyTitle, requirements = [], niceToHa
 
   return (
     <form
-      action={handleSubmit}
+      onSubmit={handleFormSubmit}
       noValidate
       className="grid gap-8 rounded-[var(--rw-radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--rw-shadow-sm)] md:p-8"
       aria-label="Formulario de postulación"

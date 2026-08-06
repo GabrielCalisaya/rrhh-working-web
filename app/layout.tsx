@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BRAND } from "@/lib/content/institucional";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
+import { siteUrl } from "@/lib/utils/site-url";
 
 /**
  * Inter, la tipografía que `globals.css` ya asumía pero que nunca se cargaba.
@@ -23,6 +24,15 @@ const DESCRIPTION =
   "Consultora de Recursos Humanos en San Salvador de Jujuy. Reclutamiento y selección de personal, difusión de ofertas laborales, armado de CV y optimización de perfiles profesionales.";
 
 export const metadata: Metadata = {
+  /**
+   * Base para resolver las URLs relativas de Open Graph.
+   *
+   * Sin esto Next avisa en cada build y, lo importante, la imagen de
+   * `opengraph-image.png` se referencia con una ruta relativa: WhatsApp,
+   * LinkedIn y Twitter necesitan una URL absoluta para poder descargarla, así
+   * que la vista previa del enlace quedaba sin imagen.
+   */
+  metadataBase: new URL(siteUrl()),
   // `template` agrega el sufijo de marca a cada página que define su propio title.
   title: {
     default: `${BRAND.name} | ${BRAND.tagline}`,

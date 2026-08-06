@@ -5,6 +5,7 @@ import { getSupabaseServerClient, getSupabaseServiceRoleClient } from "@/lib/sup
 import type { ApplicationStatusUpdateInput } from "@/lib/validators/application";
 import { assertVacancyIsOpen } from "@/lib/services/vacancy-guards";
 import { appErrors } from "@/lib/errors";
+import { notifyApplication } from "@/lib/services/application-email";
 
 const MAX_CV_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -147,43 +148,56 @@ export async function createApplication(input: ApplicationInput) {
     throw new Error(`applications.insert falló: ${applicationError.message}`);
   }
 
-  if (isMatchingEnabled()) {
-    const { data: vacancy, error: vacancyError } = await supabase
-      .from("vacancies")
-      .select("requirements")
-      .eq("id", input.vacancyId)
-      .single();
+  // Se lee una sola vez y sirve para las dos cosas: el titulo para el aviso por
+  // correo y los requisitos para el puntaje de coincidencia.
+  const { data: vacancy } = await supabase
+    .from("vacancies")
+    .select("title, requirements")
+    .eq("id", input.vacancyId)
+    .single();
 
-    if (!vacancyError && vacancy) {
-      // Skills de ESTA postulación, no las de la fila de candidates (que ahora
-      // quedan congeladas en las de la primera vez que se postuló).
-      const { score, reasons } = calculateSkillsScore(vacancy.requirements ?? [], input.candidate.skills);
-      await supabase.from("match_scores").upsert(
-        {
-          vacancy_id: input.vacancyId,
-          candidate_id: candidate.id,
-          score,
-          reasons,
-        },
-        { onConflict: "vacancy_id,candidate_id" },
-      );
+  // Se marca en el aviso por correo cuando el perfil supera el umbral, para que
+  // el equipo distinga de un vistazo qué postulaciones mirar primero.
+  let isHighMatch = false;
 
-      if (isAutoEmailEnabled() && score >= matchingThreshold()) {
-        await sendMatchingEmailStub(input.candidate.email, score);
-      }
-    }
+  if (isMatchingEnabled() && vacancy) {
+    // Skills de ESTA postulación, no las de la fila de candidates (que ahora
+    // quedan congeladas en las de la primera vez que se postuló).
+    const { score, reasons } = calculateSkillsScore(vacancy.requirements ?? [], input.candidate.skills);
+
+    await supabase.from("match_scores").upsert(
+      {
+        vacancy_id: input.vacancyId,
+        candidate_id: candidate.id,
+        score,
+        reasons,
+      },
+      { onConflict: "vacancy_id,candidate_id" },
+    );
+
+    isHighMatch = isAutoEmailEnabled() && score >= matchingThreshold();
   }
 
-  return application;
-}
+  /**
+   * Aviso por correo. Va DESPUES del insert y no lanza nunca (ver
+   * notifyApplication): la postulacion ya esta guardada, y hacer fallar la
+   * respuesta por un problema del servidor de correo haria que el candidato
+   * viera un error y se volviera a postular, cuando en realidad entro bien.
+   */
+  await notifyApplication({
+    applicationId: application.id,
+    vacancyTitle: vacancy?.title ?? "Busqueda",
+    candidateName: input.candidate.fullName,
+    candidateEmail: input.candidate.email,
+    candidatePhone: input.candidate.phone,
+    candidateCity: input.candidate.city,
+    skills: input.candidate.skills,
+    coverLetter: input.coverLetter,
+    hasCv: Boolean(input.cvFilePath),
+    isHighMatch,
+  });
 
-export async function sendMatchingEmailStub(email: string, score: number) {
-  return {
-    provider: process.env.EMAIL_PROVIDER ?? "stub",
-    delivered: false,
-    email,
-    score,
-  };
+  return application;
 }
 
 export async function updateApplicationStatus(input: ApplicationStatusUpdateInput) {

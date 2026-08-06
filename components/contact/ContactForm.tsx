@@ -64,6 +64,16 @@ export function ContactForm() {
 
   const id = (name: string) => `${uid}-${name}`;
 
+  /**
+   * Igual que en el formulario de postulación: con `action={...}` React 19
+   * resetea el formulario al terminar, aunque la validación haya fallado, y la
+   * persona perdía todo lo escrito. Con `onSubmit` los datos se conservan.
+   */
+  function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void handleSubmit(new FormData(event.currentTarget));
+  }
+
   async function handleSubmit(formData: FormData) {
     setStatus("sending");
     setErrors({});
@@ -159,7 +169,7 @@ export function ContactForm() {
 
   return (
     <form
-      action={handleSubmit}
+      onSubmit={handleFormSubmit}
       noValidate
       className="grid gap-5 rounded-[var(--rw-radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--rw-shadow-sm)] md:p-8"
       aria-label="Formulario de contacto"

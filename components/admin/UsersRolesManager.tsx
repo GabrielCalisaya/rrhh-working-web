@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { roleLabel } from "@/lib/content/status-labels";
 import type { AppRole } from "@/lib/types";
 
 type ProfileItem = {
@@ -58,8 +59,8 @@ export function UsersRolesManager({ initialProfiles }: UsersRolesManagerProps) {
                     value={profile.role}
                     onChange={(event) => updateRole(profile.id, event.target.value as AppRole)}
                   >
-                    <option value="admin">admin</option>
-                    <option value="recruiter">recruiter</option>
+                    <option value="admin">{roleLabel("admin")}</option>
+                    <option value="recruiter">{roleLabel("recruiter")}</option>
                   </select>
                 </td>
               </tr>

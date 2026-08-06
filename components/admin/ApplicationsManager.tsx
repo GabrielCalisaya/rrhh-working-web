@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { applicationStatusLabel } from "@/lib/content/status-labels";
 import type { ApplicationStatus } from "@/lib/types";
 
 export type AdminApplicationItem = {
@@ -82,11 +83,13 @@ export function ApplicationsManager({ initialApplications }: ApplicationsManager
                 value={application.status}
                 onChange={(event) => updateStatus(application.id, event.target.value as ApplicationStatus)}
               >
-                <option value="new">new</option>
-                <option value="review">review</option>
-                <option value="shortlist">shortlist</option>
-                <option value="rejected">rejected</option>
-                <option value="hired">hired</option>
+                {/* El value es el que guarda Postgres; el texto, el que lee el
+                    equipo. Ver lib/content/status-labels.ts */}
+                <option value="new">{applicationStatusLabel("new")}</option>
+                <option value="review">{applicationStatusLabel("review")}</option>
+                <option value="shortlist">{applicationStatusLabel("shortlist")}</option>
+                <option value="rejected">{applicationStatusLabel("rejected")}</option>
+                <option value="hired">{applicationStatusLabel("hired")}</option>
               </select>
 
               {application.hasCv ? (
