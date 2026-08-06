@@ -8,7 +8,7 @@ import type { Vacancy, VacancyFilters } from "@/lib/types";
 export const metadata: Metadata = {
   title: "Empleos",
   description:
-    "Búsquedas laborales abiertas. Difusión gratuita y voluntaria de oportunidades disponibles en Argentina. Filtrá por ciudad, modalidad y seniority.",
+    "Búsquedas laborales abiertas. Difusión gratuita y voluntaria de oportunidades disponibles en Argentina. Filtrá por localidad, modalidad y nivel de experiencia.",
   openGraph: {
     title: "Empleos | RRHH Working",
     description: "Búsquedas laborales abiertas en Argentina. Postulate en línea.",
@@ -66,8 +66,8 @@ export default async function EmpleosPage({
       <div>
         <h1 className="text-3xl font-semibold md:text-4xl">Empleos</h1>
         <p className="mt-2 max-w-2xl text-[var(--color-primary-dark)]">
-          Difusión gratuita y voluntaria de oportunidades laborales disponibles en Argentina. Filtrá por ciudad,
-          modalidad, seniority o palabras clave.
+          Difusión gratuita y voluntaria de oportunidades laborales disponibles en Argentina. Filtrá por localidad,
+          modalidad, nivel de experiencia o palabras clave.
         </p>
       </div>
 

@@ -38,7 +38,7 @@ export default async function AdminCandidatosPage({
               <h2 className="font-semibold">{candidate.full_name}</h2>
               <p className="text-sm text-[var(--color-primary-dark)]">{candidate.email}</p>
               <p className="text-sm text-[var(--color-primary-dark)]">{candidate.city ?? "Sin ciudad"}</p>
-              <p className="mt-2 text-xs">Skills: {(candidate.skills ?? []).join(", ") || "Sin definir"}</p>
+              <p className="mt-2 text-xs">Experiencia: {(candidate.skills ?? []).join(", ") || "Sin definir"}</p>
             </article>
           ))}
         </div>

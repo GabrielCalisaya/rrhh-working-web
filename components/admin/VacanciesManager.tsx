@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { employmentTypeLabel, seniorityLabel } from "@/lib/content/vacancy-labels";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import type { Vacancy, VacancyStatus } from "@/lib/types";
@@ -111,20 +112,22 @@ export function VacanciesManager({ initialVacancies }: VacanciesManagerProps) {
             value={form.employment_type}
             onChange={(event) => setForm((current) => ({ ...current, employment_type: event.target.value as Vacancy["employment_type"] }))}
           >
-            <option value="Full-time">Full-time</option>
-            <option value="Part-time">Part-time</option>
-            <option value="Contrato">Contrato</option>
-            <option value="Pasantía">Pasantía</option>
+            {/* El value es el que exige el CHECK de Postgres; el texto es el
+                que ve el equipo. Ver lib/content/vacancy-labels.ts */}
+            <option value="Full-time">{employmentTypeLabel("Full-time", "long")}</option>
+            <option value="Part-time">{employmentTypeLabel("Part-time", "long")}</option>
+            <option value="Contrato">{employmentTypeLabel("Contrato", "long")}</option>
+            <option value="Pasantía">{employmentTypeLabel("Pasantía", "long")}</option>
           </select>
           <select
             className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
             value={form.seniority}
             onChange={(event) => setForm((current) => ({ ...current, seniority: event.target.value as Vacancy["seniority"] }))}
           >
-            <option value="Junior">Junior</option>
-            <option value="Semi Senior">Semi Senior</option>
-            <option value="Senior">Senior</option>
-            <option value="Lead">Lead</option>
+            <option value="Junior">{seniorityLabel("Junior", "long")}</option>
+            <option value="Semi Senior">{seniorityLabel("Semi Senior", "long")}</option>
+            <option value="Senior">{seniorityLabel("Senior", "long")}</option>
+            <option value="Lead">{seniorityLabel("Lead", "long")}</option>
           </select>
           <select
             className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"

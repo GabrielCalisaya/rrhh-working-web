@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Icon } from "@/components/ui/Icon";
 import { BRAND } from "@/lib/content/institucional";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { employmentTypeLabel, seniorityLabel } from "@/lib/content/vacancy-labels";
 import { formatDate } from "@/lib/utils/format";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -76,7 +77,7 @@ export async function generateMetadata({
 
   const title = `${vacancy.title} — ${vacancy.city}`;
   const description =
-    `${vacancy.title} en ${vacancy.city}. ${vacancy.modality} · ${vacancy.employment_type}. ` +
+    `${vacancy.title} en ${vacancy.city}. ${vacancy.modality} · ${employmentTypeLabel(vacancy.employment_type)}. ` +
     `Postulate en línea en ${BRAND.name}.`;
 
   return {
@@ -187,10 +188,13 @@ export default async function PostularPage({ params }: { params: Promise<{ vacan
             </span>
           </div>
 
+          {/* Etiquetas universales en vez de los valores crudos de la base:
+              "Avanzado" y "Jornada completa" en lugar de "Senior" y
+              "Full-time". El valor almacenado no cambia. */}
           <div className="mt-5 flex flex-wrap gap-2">
             <Badge>{vacancy.modality}</Badge>
-            <Badge>{vacancy.employment_type}</Badge>
-            <Badge>{vacancy.seniority}</Badge>
+            <Badge>{employmentTypeLabel(vacancy.employment_type, "long")}</Badge>
+            <Badge>{seniorityLabel(vacancy.seniority, "long")}</Badge>
           </div>
 
           {/* En mobile la descripción y los requisitos empujan el formulario muy
@@ -263,7 +267,12 @@ export default async function PostularPage({ params }: { params: Promise<{ vacan
         <h2 className="mb-4 text-xl font-semibold text-[var(--color-text)]">
           Completá tu postulación
         </h2>
-        <ApplyForm vacancyId={vacancy.id} vacancyTitle={vacancy.title} />
+        <ApplyForm
+          vacancyId={vacancy.id}
+          vacancyTitle={vacancy.title}
+          requirements={requirements}
+          niceToHave={niceToHave}
+        />
       </section>
     </article>
   );

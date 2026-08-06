@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Input } from "@/components/ui/Input";
+import { SENIORITY_FIELD_LABEL, seniorityLabel } from "@/lib/content/vacancy-labels";
 import type { VacancyFilters } from "@/lib/types";
 
 type Facets = {
@@ -82,7 +83,7 @@ export function JobsFilterBar({ filters, facets, resultCount }: Props) {
 
         <div>
           <label htmlFor="seniority" className="sr-only">
-            Seniority
+            {SENIORITY_FIELD_LABEL}
           </label>
           <select
             id="seniority"
@@ -92,10 +93,10 @@ export function JobsFilterBar({ filters, facets, resultCount }: Props) {
             // enfocar el campo. Mismo criterio que en <Input />.
             className="min-h-11 w-full rounded-[var(--rw-radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 py-2.5 text-base text-[var(--color-text)] outline-none transition-[border-color,box-shadow] duration-[var(--rw-duration-fast)] focus:border-[var(--color-primary-dark)] focus:ring-4 focus:ring-[var(--color-primary)]/20 md:min-h-10 md:text-sm"
           >
-            <option value="">Todas las seniorities</option>
+            <option value="">Todos los niveles de experiencia</option>
             {facets.seniorities.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {seniorityLabel(item, "long")}
               </option>
             ))}
           </select>
