@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-label="New Tech">
+  <!--
+    Isotipo de New Tech, redibujado como SVG en lugar de recortar el PNG.
+
+    Dos motivos:
+    1. `currentColor` hace que herede el color del texto del pie, así que se
+       adapta solo al modo claro y al oscuro. Un PNG de trazo negro con fondo
+       blanco se vería como un recuadro blanco sobre el tema oscuro.
+    2. Al ser vectorial se ve nítido a cualquier tamaño y pesa unos cientos de
+       bytes, contra decenas de KB del mapa de bits.
+  -->
+  <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="4" />
+  <path
+    d="M19 14 9 24l10 10M29 14l10 10-10 10"
+    stroke="currentColor"
+    stroke-width="4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

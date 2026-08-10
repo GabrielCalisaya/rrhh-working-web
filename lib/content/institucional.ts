@@ -258,6 +258,7 @@ export const TEAM: readonly TeamMember[] = [
   {
     name: "Mariana Garcia",
     role: "Fundadora",
+    photo: "/equipo/mariana-garcia.jpg",
     bio: "Licenciada en Recursos Humanos por la Universidad Católica de Salta. Actualmente se desempeña como responsable del área de Recursos Humanos en una empresa líder del norte argentino. Participa en los procesos de selección y en el desarrollo de metodologías innovadoras para la atracción y retención del talento.",
   },
   {
