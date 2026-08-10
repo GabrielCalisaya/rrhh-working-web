@@ -71,8 +71,12 @@ export function Footer() {
       </div>
 
       {/* Segunda línea, separada y más tenue que el copyright del cliente: la
-          jerarquía deja claro de quién es el sitio y quién lo hizo. */}
-      <div className="mt-5 border-t border-[var(--color-border)] pt-4 text-xs text-[var(--color-text-muted)]">
+          jerarquía deja claro de quién es el sitio y quién lo hizo.
+
+          Centrado y no alineado a la izquierda: pegado al margen quedaba justo
+          debajo del copyright y los dos textos competían por el mismo eje. Al
+          centro se lee como un cierre del pie, que es lo que es. */}
+      <div className="mt-5 border-t border-[var(--color-border)] pt-4 text-center text-xs text-[var(--color-text-muted)]">
         <DeveloperCredit />
       </div>
     </footer>
